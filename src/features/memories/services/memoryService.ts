@@ -17,6 +17,12 @@ export type CreateMemoryInput = {
   mood?: MemoryMood;
 };
 
+export type UpdateMemoryInput = {
+  albumId: string;
+  comment?: string;
+  mood?: MemoryMood;
+};
+
 function createId(prefix: string): string {
   if (typeof globalThis.crypto?.randomUUID === "function") {
     return globalThis.crypto.randomUUID();
@@ -62,6 +68,40 @@ export async function createMemory(input: CreateMemoryInput): Promise<Memory> {
 
   await memoryRepository.save(memory);
   return memory;
+}
+
+/** Henter ett minne fra lokal lagring. */
+export async function getMemoryById(memoryId: string): Promise<Memory | null> {
+  if (!memoryId) return null;
+  return memoryRepository.getById(memoryId);
+}
+
+/** Oppdaterer kommentar, følelse eller album for et eksisterende minne. */
+export async function updateMemory(
+  memoryId: string,
+  input: UpdateMemoryInput,
+): Promise<Memory> {
+  const existingMemory = await getMemoryById(memoryId);
+
+  if (!existingMemory) {
+    throw new Error("MEMORY_NOT_FOUND");
+  }
+
+  if (!input.albumId.trim()) {
+    throw new Error("ALBUM_REQUIRED");
+  }
+
+  const comment = input.comment?.trim();
+  const updatedMemory: Memory = {
+    ...existingMemory,
+    albumId: input.albumId,
+    comment: comment || undefined,
+    mood: input.mood,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await memoryRepository.save(updatedMemory);
+  return updatedMemory;
 }
 
 /** Henter minnene i ett album i kronologisk rekkefølge. */
