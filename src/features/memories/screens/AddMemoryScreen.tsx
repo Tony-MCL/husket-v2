@@ -3,7 +3,7 @@
 // ===============================
 
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -16,10 +16,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { getAlbums } from "../../albums/services/albumService";
 import { useLanguage } from "../../../i18n/LanguageProvider";
 import type { Album, ImportedMemory, MemoryMood } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
+import { getAlbums } from "../../albums/services/albumService";
 import { createMemory } from "../services/memoryService";
 import {
   importFromCamera,
@@ -36,9 +36,16 @@ const moodOptions: Array<{ value: MemoryMood; emoji: string }> = [
   { value: "sad", emoji: "😢" },
 ];
 
-export function AddMemoryScreen() {
+type MemorySource = "camera" | "photo-library";
+
+type AddMemoryScreenProps = {
+  initialSource?: MemorySource;
+};
+
+export function AddMemoryScreen({ initialSource }: AddMemoryScreenProps) {
   const { t } = useLanguage();
   const theme = useAppTheme();
+  const initialSourceOpened = useRef(false);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [importedMemory, setImportedMemory] = useState<ImportedMemory | null>(null);
@@ -65,7 +72,7 @@ export function AddMemoryScreen() {
     void loadAlbums();
   }, [t]);
 
-  async function handleImport(source: "camera" | "photo-library") {
+  async function handleImport(source: MemorySource) {
     try {
       setError(null);
       setIsImporting(true);
@@ -86,6 +93,12 @@ export function AddMemoryScreen() {
       setIsImporting(false);
     }
   }
+
+  useEffect(() => {
+    if (!initialSource || initialSourceOpened.current) return;
+    initialSourceOpened.current = true;
+    void handleImport(initialSource);
+  }, [initialSource]);
 
   async function handleSave() {
     if (!importedMemory || !selectedAlbumId || isSaving) return;
@@ -108,7 +121,9 @@ export function AddMemoryScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}> 
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
+    >
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[
@@ -343,7 +358,11 @@ const styles = StyleSheet.create({
   sourceButton: { borderWidth: 1, gap: 6 },
   sourceTitle: { fontSize: 18, fontWeight: "700" },
   editorPanel: { borderWidth: 1 },
-  previewImage: { width: "100%", aspectRatio: 4 / 3, backgroundColor: "#00000010" },
+  previewImage: {
+    width: "100%",
+    aspectRatio: 4 / 3,
+    backgroundColor: "#00000010",
+  },
   input: { borderWidth: 1, fontSize: 16 },
   commentInput: { minHeight: 92, textAlignVertical: "top" },
   sectionTitle: { fontSize: 17, fontWeight: "700" },
