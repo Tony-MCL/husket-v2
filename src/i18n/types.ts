@@ -19,6 +19,7 @@ export type TranslationDictionary = {
     eyebrow: string;
     title: string;
     body: string;
+    addMemory: string;
     createTitle: string;
     titlePlaceholder: string;
     descriptionPlaceholder: string;
@@ -28,6 +29,20 @@ export type TranslationDictionary = {
     empty: string;
     loadError: string;
     saveError: string;
+  };
+  memories: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    back: string;
+    camera: string;
+    cameraBody: string;
+    photoLibrary: string;
+    photoLibraryBody: string;
+    readyTitle: string;
+    readyBody: string;
+    cameraPermissionError: string;
+    importError: string;
   };
 };
 
@@ -45,6 +60,7 @@ export type TranslationPath =
   | "albums.eyebrow"
   | "albums.title"
   | "albums.body"
+  | "albums.addMemory"
   | "albums.createTitle"
   | "albums.titlePlaceholder"
   | "albums.descriptionPlaceholder"
@@ -53,4 +69,16 @@ export type TranslationPath =
   | "albums.yourAlbums"
   | "albums.empty"
   | "albums.loadError"
-  | "albums.saveError";
+  | "albums.saveError"
+  | "memories.eyebrow"
+  | "memories.title"
+  | "memories.body"
+  | "memories.back"
+  | "memories.camera"
+  | "memories.cameraBody"
+  | "memories.photoLibrary"
+  | "memories.photoLibraryBody"
+  | "memories.readyTitle"
+  | "memories.readyBody"
+  | "memories.cameraPermissionError"
+  | "memories.importError";

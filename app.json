@@ -24,7 +24,15 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "husk'et trenger tilgang til bildene dine for at du skal kunne legge dem til som minner.",
+          "cameraPermission": "husk'et trenger tilgang til kameraet for at du skal kunne ta bilder til minnene dine.",
+          "microphonePermission": false
+        }
+      ]
     ]
   }
 }
