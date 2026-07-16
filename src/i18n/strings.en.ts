@@ -13,4 +13,18 @@ export const en = {
     structureTitle: "Built to grow",
     structureBody: "Routes, features, theme and language support are separated into small, focused files.",
   },
+  albums: {
+    eyebrow: "Sprint 1.3",
+    title: "Your albums",
+    body: "Create the first album and keep its title and story locally on this device.",
+    createTitle: "Create album",
+    titlePlaceholder: "Album title",
+    descriptionPlaceholder: "A short introduction or story for the album (optional)",
+    createButton: "Create album",
+    saving: "Saving…",
+    yourAlbums: "Saved albums",
+    empty: "No albums yet. Create the first one above.",
+    loadError: "The albums could not be loaded.",
+    saveError: "The album could not be saved.",
+  },
 } as const;
