@@ -14,7 +14,7 @@ export const en = {
     structureBody: "Routes, features, theme and language support are separated into small, focused files.",
   },
   albums: {
-    eyebrow: "Sprint 1.6",
+    eyebrow: "Sprint 1.7",
     title: "Your albums",
     body: "Create albums, preserve their stories, and open them to revisit your memories.",
     addMemory: "Add memory",
@@ -57,5 +57,18 @@ export const en = {
     importError: "The image could not be imported. Please try another image.",
     albumLoadError: "The albums could not be loaded.",
     saveError: "The memory could not be saved.",
+  },
+  memoryDetail: {
+    eyebrow: "Memory",
+    title: "Edit memory",
+    back: "Back to album",
+    commentPlaceholder: "A short comment about this moment (optional)",
+    moodTitle: "How did this moment feel?",
+    albumTitle: "Album",
+    saveButton: "Save changes",
+    saving: "Saving…",
+    loadError: "The memory could not be loaded.",
+    saveError: "The changes could not be saved.",
+    notFound: "The memory could not be found.",
   },
 } as const;
