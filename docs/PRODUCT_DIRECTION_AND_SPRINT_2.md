@@ -23,6 +23,10 @@ Deling er et hovedmål, men ikke første utviklingsprioritet. Album- og minneopp
 
 husk'et skal kunne bli et privat alternativ til den delen av Snapchat som brukes til direkte deling mellom mennesker, uten stories, spotlight, chat, algoritmer eller aggressiv oppmerksomhetsdesign.
 
+> husk'et skal hjelpe mennesker med å ta vare på og dele minner – aldri konkurrere om oppmerksomheten deres.
+
+Et husk'et deles fordi det betyr noe, ikke fordi appen ønsker aktivitet.
+
 ---
 
 ## 2. Hva husk'et ikke skal være
@@ -36,6 +40,7 @@ husk'et skal ikke være:
 - en algoritmisk innholdsstrøm
 - en tjeneste bygget rundt streaks, engasjementspress eller kontinuerlig aktivitet
 - et vanlig bildegalleri eller en filbehandler
+- en app som lokker brukeren tilbake uten at noe meningsfullt har skjedd
 
 Brukeren skal møte egne minner og minner noen aktivt har valgt å dele med dem.
 
@@ -46,6 +51,8 @@ Brukeren skal møte egne minner og minner noen aktivt har valgt å dele med dem.
 Appen er ikke en feed.
 
 Appen er et personlig bibliotek.
+
+Biblioteket er rommet. Bokhyllen er startskjermen og den visuelle inngangen til hele opplevelsen.
 
 Den styrende navigasjonsmetaforen er:
 
@@ -85,19 +92,25 @@ Et minne er det enkelte arkiverte øyeblikket og kan åpnes for visning og redig
 
 ## 4. Startskjermen og bokhyllen
 
-Startskjermen skal etter hvert være en bokhylle.
+Bokhyllen er appens åpningsskjerm.
 
 Bokhyllen starter tom. Den skal ikke fylles med eksempelalbum eller kunstig innhold.
 
 Album oppstår naturlig når brukeren lager sitt første album.
 
-På bokhyllen skal det etter hvert kunne stå:
+Toppen av bokhyllen skal fungere som en rolig flate med gjenstander, ikke som en verktøylinje med store knapper.
 
-- kamera
-- brukerens album
-- en konvolutt når mottatte minner finnes
+På toppen av bokhyllen skal det kunne stå:
 
-Kameraet skal oppleves som et objekt i rommet og en naturlig del av biblioteket, ikke bare som en løs knapp i et standard grensesnitt.
+- et kamera med direkte tilgang til telefonens kamera
+- en bilderamme som åpner import fra kamerarullen og senere andre kilder
+- en liten bunke brev når mottatte husk'et finnes
+
+Brevbunken skal ikke være synlig når innboksen er tom.
+
+Kameraet, bilderammen og brevene skal oppleves som objekter i rommet, ikke som standardknapper med ropende handlingsdesign.
+
+Selve bokhyllen under inneholder brukerens album som bøker.
 
 Bokhyllen skal være rolig, tydelig og enkel å forstå selv når brukeren får mange album.
 
@@ -154,7 +167,32 @@ Kortene fra husk'et v1 videreføres kun som delingspresentasjon. Albumet skal al
 
 ---
 
-## 7. Bibliotekstiler og tema
+## 7. Varsler og oppmerksomhet
+
+Varsler skal representere en virkelig hendelse eller et tidsmessig relevant tilbakeblikk.
+
+Tillatte varseltyper i v1 er:
+
+- mottatt husk'et
+- emoji-reaksjon på et delt husk'et
+- tilbakeblikk dersom brukeren selv har aktivert funksjonen
+
+Varsler skal ikke brukes til:
+
+- streaks
+- «kom tilbake»-meldinger
+- påminnelser om at appen ikke er åpnet
+- engasjementsvarsler
+- algoritmestyrte forslag
+- tilfeldige tilbakeblikk
+
+Når brukeren har aktivert tilbakeblikk, skal appen vise relevante tilbakeblikk uten å spørre på nytt eller starte en ekstra onboardingflyt.
+
+Detaljert varsel- og tilbakeblikkpolicy er dokumentert i `docs/NOTIFICATIONS_AND_MEMORIES.md`.
+
+---
+
+## 8. Bibliotekstiler og tema
 
 husk'et skal støtte bibliotekstiler.
 
@@ -183,7 +221,7 @@ Temaarkitekturen skal derfor skilles fra navigasjon og layout, slik at nye bibli
 
 ---
 
-## 8. Status etter Sprint 1
+## 9. Status etter Sprint 1
 
 Sprint 0A og Sprint 1.1–1.7 er ferdige og testet med grønn build.
 
@@ -213,7 +251,7 @@ Permanent medielagring løses i Sprint 2B ved å kopiere bilder til appens eget 
 
 ---
 
-## 9. Sprint 2 – hovedregel
+## 10. Sprint 2 – hovedregel
 
 Sprint 2 starter ikke med Firebase.
 
@@ -227,7 +265,7 @@ Ingen backend- eller delingsarkitektur skal innføres før albumopplevelsen og d
 
 ---
 
-## 10. Sprint 2A – Album Experience
+## 11. Sprint 2A – Album Experience
 
 ### Mål
 
@@ -237,7 +275,9 @@ Bygge den første helhetlige opplevelsen av bibliotek, bokhylle, album og oppsla
 
 - bokhylle som startskjerm
 - tom bokhylle for nye brukere
+- toppflate med kamera, bilderamme og betinget brevbunke
 - representasjon av kamera som objekt i biblioteket
+- representasjon av bilderamme som inngang til import
 - representasjon av album på bokhyllen
 - åpning av album fra bokhyllen
 - oppslag som hovedvisning i albumet
@@ -269,7 +309,7 @@ Opplevelsen skal fungere uten realistisk sidevending.
 
 ---
 
-## 11. Sprint 2A.1 – prototype på sidevending
+## 12. Sprint 2A.1 – prototype på sidevending
 
 Sidevending skal undersøkes i en separat og avgrenset prototype.
 
@@ -292,7 +332,7 @@ Resultatet kan bli:
 
 ---
 
-## 12. Sprint 2B – Media Library
+## 13. Sprint 2B – Media Library
 
 ### Mål
 
@@ -317,7 +357,7 @@ Den skal ikke automatisk utvides til skylagring, Firebase eller delingsbackend.
 
 ---
 
-## 13. Sprint 2C – delingsmodell
+## 14. Sprint 2C – delingsmodell
 
 ### Mål
 
@@ -341,7 +381,7 @@ Firebase eller annen backend vurderes først i denne fasen, ikke før.
 
 ---
 
-## 14. Sprint 2D – innboks
+## 15. Sprint 2D – innboks
 
 ### Mål
 
@@ -349,7 +389,8 @@ Bygge mottakeropplevelsen for delte minner.
 
 ### Omfang
 
-- konvolutt på bokhyllen når mottatte minner finnes
+- brevbunke på bokhyllen når mottatte minner finnes
+- ingen brevbunke når innboksen er tom
 - enkel innboks uten feedpreg
 - åpning av mottatt delingskort
 - emoji-reaksjon
@@ -360,7 +401,7 @@ Bygge mottakeropplevelsen for delte minner.
 
 ---
 
-## 15. Beslutninger som er låst før Sprint 2
+## 16. Beslutninger som er låst før Sprint 2
 
 Følgende beslutninger skal ikke endres gjennom tilfeldige UI-valg under implementering:
 
@@ -368,19 +409,25 @@ Følgende beslutninger skal ikke endres gjennom tilfeldige UI-valg under impleme
 - egne minner og privat deling er likeverdige hovedmål
 - deling bygges etter albumopplevelsen, ikke i stedet for den
 - appen er et personlig bibliotek, ikke en feed
-- bokhyllen er startskjermens hovedmetafor
+- biblioteket er rommet og bokhyllen er startskjermen
+- toppen av bokhyllen bruker objekter, ikke store standardknapper
+- kamera åpner kameraet direkte
+- bilderammen åpner import
+- brevbunken vises bare når mottatte husk'et finnes
 - album vises som oppslag
 - album bruker aldri delingskort
 - delingskort brukes kun ved deling
 - mottakeren velger selv om et delt minne skal legges i eget album
 - husk'et skal ikke ha chat
+- varsler skal representere virkelige hendelser eller tidsmessig relevante tilbakeblikk
+- tilbakeblikk er valgfritt og aldri tilfeldig i v1
 - tema endrer atmosfære, ikke struktur
 - realistisk sidevending er en prototype, ikke fundament
 - Firebase introduseres ikke før delingsmodellen krever det
 
 ---
 
-## 16. Arbeidsrekkefølge
+## 17. Arbeidsrekkefølge
 
 Videre arbeid skal følge denne rekkefølgen:
 
