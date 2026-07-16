@@ -1,5 +1,5 @@
-import { SprintZeroScreen } from "../src/features/foundation/screens/SprintZeroScreen";
+import { AlbumListScreen } from "../src/features/albums/screens/AlbumListScreen";
 
 export default function IndexRoute() {
-  return <SprintZeroScreen />;
+  return <AlbumListScreen />;
 }
