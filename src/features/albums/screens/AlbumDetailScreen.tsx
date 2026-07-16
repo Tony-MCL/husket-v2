@@ -121,7 +121,7 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
                   <AlbumPage
                     key={memory.id}
                     memory={memory}
-                    onPress={() => undefined}
+                    onPress={() => router.push(`/memories/${memory.id}`)}
                   />
                 ))}
               </View>
