@@ -15,6 +15,20 @@ export type TranslationDictionary = {
     structureTitle: string;
     structureBody: string;
   };
+  albums: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    createTitle: string;
+    titlePlaceholder: string;
+    descriptionPlaceholder: string;
+    createButton: string;
+    saving: string;
+    yourAlbums: string;
+    empty: string;
+    loadError: string;
+    saveError: string;
+  };
 };
 
 export type TranslationPath =
@@ -27,4 +41,16 @@ export type TranslationPath =
   | "foundation.languageTitle"
   | "foundation.languageBody"
   | "foundation.structureTitle"
-  | "foundation.structureBody";
+  | "foundation.structureBody"
+  | "albums.eyebrow"
+  | "albums.title"
+  | "albums.body"
+  | "albums.createTitle"
+  | "albums.titlePlaceholder"
+  | "albums.descriptionPlaceholder"
+  | "albums.createButton"
+  | "albums.saving"
+  | "albums.yourAlbums"
+  | "albums.empty"
+  | "albums.loadError"
+  | "albums.saveError";
