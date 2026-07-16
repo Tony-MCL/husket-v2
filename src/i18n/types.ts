@@ -13,6 +13,17 @@ export type TranslationDictionary = {
     structureTitle: string;
     structureBody: string;
   };
+  library: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    camera: string;
+    photoFrame: string;
+    emptyTitle: string;
+    emptyBody: string;
+    manageAlbums: string;
+    loadError: string;
+  };
   albums: {
     eyebrow: string;
     title: string;
@@ -76,6 +87,7 @@ export type TranslationDictionary = {
 export type TranslationPath =
   | "app.name"
   | `foundation.${keyof TranslationDictionary["foundation"]}`
+  | `library.${keyof TranslationDictionary["library"]}`
   | `albums.${keyof TranslationDictionary["albums"]}`
   | `albumDetail.${keyof TranslationDictionary["albumDetail"]}`
   | `memories.${keyof TranslationDictionary["memories"]}`
