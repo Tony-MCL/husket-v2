@@ -27,6 +27,10 @@ Appen skal kombinere:
 - en innboks for mottatte husk'et
 - mulighet for å lagre mottatte husk'et i eget album
 
+For utviklingen er albumet appens viktigste produktområde. For brukeren er det egne personlige minner som er hjertet i opplevelsen.
+
+Albumet skal gjøre minnene enkle å arkivere, oversiktlige å finne igjen og hyggelige å bla i.
+
 husk'et skal ikke være et sosialt nettverk og skal ikke forsøke å holde brukeren inne i en endeløs strøm av innhold.
 
 Produktmålet er å tilby et privat og rolig alternativ til den delen av Snapchat som handler om direkte deling mellom mennesker, uten stories, spotlight, chat, algoritmer eller sosial støy.
@@ -41,7 +45,7 @@ Alt som deles i appen er et husk'et.
 
 Et husk'et kan inneholde et nytt bilde eller et eldre bilde som allerede ligger i brukerens album. Delingsopplevelsen skal være identisk uansett når bildet eller minnet ble opprettet.
 
-Det skal ikke være noe visuelt eller funksjonelt skille mellom et "nytt" og et "gammelt" delt husk'et.
+Det skal ikke være noe visuelt eller funksjonelt skille mellom et «nytt» og et «gammelt» delt husk'et.
 
 ### 3.2 Ingen chat
 
@@ -89,13 +93,92 @@ Mottakeren skal kunne:
 
 Et husk'et skal aldri automatisk legges til mottakerens personlige album.
 
-### 3.5 Albumet er en minnebok
+### 3.5 Albumet er appens produktmessige hjerte
 
 Albumet skal oppleves som et godt, gammeldags fotoalbum i digital form.
 
-Det skal føles personlig, rolig og hyggelig å bla i. Designet skal ikke oppleves som en teknisk database eller filbehandler.
+Det skal føles personlig, rolig og hyggelig å bla i. Designet skal ikke oppleves som en teknisk database, filbehandler eller et vanlig bilderutenett.
 
-### 3.6 Ingen algoritmisk innholdsstrøm
+Albumet skal kombinere følelsen fra et fysisk papiralbum med fordelene ved en moderne mobilapp:
+
+- enkel oversikt
+- rask navigasjon
+- tydelig struktur
+- mulighet til å søke og finne igjen minner
+- mulighet til å hoppe mellom perioder og album
+- rolige og varierte bildeoppsett
+- en tydelig følelse av rekkefølge, historie og sammenheng
+
+Albumet må være enkelt å bruke selv når brukeren har mange bilder og flere album.
+
+### 3.6 Minnet er brukerens hjerte
+
+Et husk'et er et personlig minne som brukeren har valgt å arkivere i appen.
+
+Et minne skal kunne inneholde:
+
+- ett eller flere bilder eller andre støttede medier
+- en kort, valgfri kommentar
+- en valgfri emoji som uttrykker følelsen eller stemningen i øyeblikket
+- opprinnelig dato når denne er kjent
+- sted når dette er tilgjengelig og brukeren tillater det
+- kobling til albumet minnet er arkivert i
+
+Et minne skal kunne lagres raskt uten at brukeren må fylle ut kommentar, følelse, sted eller andre metadata.
+
+Emoji-feltet skal ikke omtales som rating. Det skal uttrykke hvordan øyeblikket føltes, ikke rangere om minnet var bra eller dårlig.
+
+### 3.7 Mange kilder – én importflyt
+
+husk'et skal kunne hente minner fra flest mulig relevante kilder.
+
+Første aktuelle kilder er:
+
+- kameraet i husk'et
+- telefonens bildebibliotek
+- et mottatt husk'et
+- telefonens delingsmeny på Android og iOS
+
+Fremtidige kilder kan blant annet være:
+
+- skannede papirbilder
+- filer fra telefonen
+- sikkerhetskopier
+- skytjenester
+- eksterne kameraer eller datamaskiner
+- nye medietyper
+
+Alle kilder skal levere innhold til samme klargjøringsflyt:
+
+```text
+Kilde
+  ↓
+Importert medie
+  ↓
+Klargjør minne
+  ↓
+Velg eller opprett album
+  ↓
+Lagre som husk'et
+```
+
+Kilden skal ikke bestemme hvordan minnet lagres, vises eller organiseres i albumet.
+
+Et bilde tatt i husk'et, importert fra bildebiblioteket eller mottatt fra en annen bruker skal bli samme type minne etter at brukeren har valgt å arkivere det.
+
+Hver ny kilde skal bygges som en separat adapter mot et felles importformat. Dette skal gjøre det mulig å legge til nye kilder uten å bygge om albumet, minnemodellen eller lagringslogikken.
+
+Opprinnelig kilde kan lagres som intern metadata når det er nyttig for feilsøking, importhistorikk eller dublettkontroll, men skal ikke prege den vanlige albumopplevelsen.
+
+### 3.8 Album erstatter kategorier som primær organisering
+
+Album skal være den primære måten brukeren organiserer minner på.
+
+Synlige kategorier skal ikke inngå i første versjon. Brukeren skal ikke måtte organisere det samme minnet både i et album og i en kategori.
+
+Datamodellen skal likevel ikke låses mot fremtidig støtte for enkle merkelapper eller emneknagger dersom reell bruk viser at dette er nyttig.
+
+### 3.9 Ingen algoritmisk innholdsstrøm
 
 husk'et skal ikke ha:
 
@@ -109,7 +192,7 @@ husk'et skal ikke ha:
 
 Brukeren skal bare se eget innhold og innhold som noen aktivt har delt med dem.
 
-### 3.7 Varsler skal være relevante
+### 3.10 Varsler skal være relevante
 
 Varsler skal begrenses til konkrete hendelser som gir brukeren verdi.
 
@@ -129,21 +212,87 @@ Første komplette produktversjon skal minst dekke følgende hovedflyt:
 
 1. Brukeren oppretter en konto eller logger inn.
 2. Brukeren oppretter et husk'et fra kamera eller bildebibliotek.
-3. Brukeren kan lagre husk'et i eget album.
-4. Brukeren kan dele husk'et med en valgt kontakt.
-5. Mottakeren får et push-varsel.
-6. Mottakeren åpner husk'et i innboksen.
-7. Mottakeren kan reagere med en emoji.
-8. Senderen får et enkelt push-varsel om reaksjonen.
-9. Mottakeren kan legge husk'et til i eget album.
+3. Brukeren kan legge til en kort kommentar og en valgfri følelsesemoji.
+4. Brukeren velger eller oppretter et album.
+5. Brukeren lagrer husk'et i eget album.
+6. Brukeren kan navigere enkelt og oversiktlig i albumet.
+7. Brukeren kan dele husk'et med en valgt kontakt.
+8. Mottakeren får et push-varsel.
+9. Mottakeren åpner husk'et i innboksen.
+10. Mottakeren kan reagere med en emoji.
+11. Senderen får et enkelt push-varsel om reaksjonen.
+12. Mottakeren kan legge husk'et til i eget album.
 
 Funksjoner utenfor denne kjernen skal vurderes nøye før de legges til.
 
 ---
 
-## 5. Teknisk retning
+## 5. Foreløpig domenemodell
 
-### 5.1 Plattform
+### 5.1 Memory
+
+Et `Memory` representerer et arkivert husk'et i brukerens album.
+
+Foreløpige egenskaper:
+
+- unik ID
+- ett eller flere medier
+- album-ID
+- valgfri kort kommentar
+- valgfri følelsesemoji
+- opprinnelig dato
+- valgfritt sted
+- opprettet og sist oppdatert
+- intern kildeinformasjon når dette er nødvendig
+
+Den endelige modellen fastsettes før lagringslaget implementeres.
+
+### 5.2 ImportedMemory
+
+Et `ImportedMemory` er et midlertidig, normalisert format mellom en kilde og lagring som et ferdig minne.
+
+Formatet skal kunne inneholde:
+
+- kilde
+- lokal URI eller filreferanse
+- filnavn og MIME-type
+- dimensjoner
+- opprinnelig dato
+- sted
+- kildespesifikk metadata
+
+Kildespesifikk informasjon skal ikke lekke inn i albumlogikken.
+
+### 5.3 Album
+
+Et `Album` er brukerens primære organisering av minner.
+
+Albumet skal støtte:
+
+- navn og valgfri beskrivelse
+- omslag eller representativt bilde
+- tydelig rekkefølge
+- enkel navigasjon mellom minner og oppslag
+- visning som gir assosiasjoner til et fysisk fotoalbum
+- senere utvidelse med flere visnings- og layoutmuligheter
+
+### 5.4 Kildeadaptere
+
+Hver inngangskilde skal implementere et felles grensesnitt og levere et normalisert `ImportedMemory`.
+
+Aktuelle adaptere:
+
+- `CameraSource`
+- `PhotoLibrarySource`
+- `InboxSource`
+- `SystemShareSource`
+- senere `FileSource`, `ScannerSource`, `BackupSource` og andre behov
+
+---
+
+## 6. Teknisk retning
+
+### 6.1 Plattform
 
 husk'et v2 bygges som en mobilapp med Expo og React Native.
 
@@ -154,7 +303,7 @@ Målplattformer:
 
 Web brukes som utviklings- og kontrollflate, men er ikke en produksjonsplattform for sluttbrukere.
 
-### 5.2 Ny kodebase
+### 6.2 Ny kodebase
 
 Prosjektet bygges i det nye repoet `husket-v2`.
 
@@ -169,7 +318,7 @@ Det eksisterende repoet `husket` brukes som referanse når vi trenger å unders�
 
 Kode skal ikke kopieres ukritisk. Hver løsning vurderes mot den nye produktretningen og arkitekturen.
 
-### 5.3 Foreløpig teknologistakk
+### 6.3 Foreløpig teknologistakk
 
 - Expo
 - React Native
@@ -181,7 +330,7 @@ Kode skal ikke kopieres ukritisk. Hver løsning vurderes mot den nye produktretn
 
 Backend, autentisering, datalagring, bildearkitektur og push-infrastruktur besluttes senere og dokumenteres før implementering.
 
-### 5.4 Plattformidentifikatorer
+### 6.4 Plattformidentifikatorer
 
 Utviklingsversjonen skal kunne installeres samtidig med den eksisterende publiserte husk'et-appen.
 
@@ -192,9 +341,9 @@ Endelige Android- og iOS-identifikatorer skal ikke låses før vi har bestemt om
 
 ---
 
-## 6. Utviklings- og teststrategi
+## 7. Utviklings- og teststrategi
 
-### 6.1 Daglig utvikling på web
+### 7.1 Daglig utvikling på web
 
 Web brukes til raske utviklingsrunder og kontroll av:
 
@@ -211,12 +360,13 @@ Web brukes til raske utviklingsrunder og kontroll av:
 
 En grønn web-build betyr ikke at mobilfunksjonene er ferdig verifisert.
 
-### 6.2 Testing på fysiske enheter
+### 7.2 Testing på fysiske enheter
 
 Følgende områder skal alltid testes på ekte Android- og iOS-enheter:
 
 - kamera
 - bildebibliotek
+- systemets delingsmeny
 - tillatelser
 - lokal fillagring
 - push-varsler
@@ -229,13 +379,13 @@ Følgende områder skal alltid testes på ekte Android- og iOS-enheter:
 - appikon og splash
 - plattformspesifikke forskjeller
 
-### 6.3 Development builds
+### 7.3 Development builds
 
 Development builds brukes til løpende mobiltesting mellom større milepæler.
 
 Expo Go skal ikke være prosjektets eneste mobiltestmiljø, fordi appen vil kreve native funksjoner og konfigurasjoner som må testes i appens egentlige runtime.
 
-### 6.4 Intern testing
+### 7.4 Intern testing
 
 Ved komplette funksjonelle milepæler distribueres builds til:
 
@@ -250,8 +400,9 @@ Eksempler på milepæler:
 - dele og motta et husk'et
 - push-varsler
 - emoji-reaksjoner
+- import gjennom systemets delingsmeny
 
-### 6.5 Produksjonsklar kontroll
+### 7.5 Produksjonsklar kontroll
 
 Før publisering skal appen testes som produksjonsbuild på begge plattformer.
 
@@ -259,7 +410,7 @@ Web, development build og én enkelt plattform kan aldri alene brukes som endeli
 
 ---
 
-## 7. Arbeidsmåte
+## 8. Arbeidsmåte
 
 Utviklingen gjennomføres stegvis.
 
@@ -277,7 +428,7 @@ Vi prioriterer stabile, pragmatiske løsninger fremfor unødvendig kompleksitet.
 
 ---
 
-## 8. Designretning
+## 9. Designretning
 
 Appen skal oppleves:
 
@@ -298,9 +449,11 @@ Appen skal ikke skape:
 
 Fotoalbumet og selve husk'et skal være visuelt viktigere enn menyer, systeminformasjon og tekniske funksjoner.
 
+Albumet skal hente inspirasjon fra fysiske fotoalbum uten å kopiere deres begrensninger. Digitale fordeler som søk, filtrering, raske hopp og fleksibel navigasjon skal integreres uten at albumfølelsen forsvinner.
+
 ---
 
-## 9. Inntektsmodell
+## 10. Inntektsmodell
 
 Appen skal ikke starte med en aggressiv paywall.
 
@@ -320,21 +473,23 @@ Kjerneopplevelsen skal ikke ødelegges av tidlig eller unødvendig funksjonslås
 
 ---
 
-## 10. Beslutningsregel for nye funksjoner
+## 11. Beslutningsregel for nye funksjoner
 
 Før en ny funksjon legges til, skal vi spørre:
 
 1. Hjelper funksjonen brukeren med å bevare eller dele et minne?
-2. Gjør funksjonen appen roligere eller mer støyende?
-3. Flytter funksjonen appen mot et privat fotoalbum eller mot et sosialt nettverk?
-4. Er funksjonen nødvendig nå, eller kan den vente?
-5. Bevarer funksjonen brukerens kontroll og personvern?
+2. Gjør funksjonen albumet bedre, mer oversiktlig eller hyggeligere å bruke?
+3. Gjør funksjonen appen roligere eller mer støyende?
+4. Flytter funksjonen appen mot et privat fotoalbum eller mot et sosialt nettverk?
+5. Er funksjonen nødvendig nå, eller kan den vente?
+6. Bevarer funksjonen brukerens kontroll og personvern?
+7. Kan funksjonen bygges som en avgrenset utvidelse uten å låse fremtidige kilder eller medietyper?
 
 Dersom en funksjon gjør husk'et mer lik et offentlig sosialt nettverk eller en chat-app, skal den som hovedregel ikke bygges.
 
 ---
 
-## 11. Åpne hovedbeslutninger
+## 12. Åpne hovedbeslutninger
 
 Følgende områder må avklares og dokumenteres før de bygges:
 
@@ -347,16 +502,20 @@ Følgende områder må avklares og dokumenteres før de bygges:
 - personvernmodell
 - kryptering og tilgangskontroll
 - håndtering av sletting og kontoavslutning
-- format og metadata for et husk'et
+- endelig format og metadata for et husk'et
 - innboksens livssyklus
-- albumstruktur og bokvisning
+- albumstruktur, sideoppslag og bokvisning
+- søk, tidsnavigasjon og større albumsamlinger
+- konkret sett med følelsesemoji
+- om og hvordan merkelapper skal innføres senere
 - om v2 erstatter eksisterende butikkapp
 - fremtidig betalingsmodell
 
 ---
 
-## 12. Dokumentstatus
+## 13. Dokumentstatus
 
-- Dokumentversjon: 0.1
+- Dokumentversjon: 0.2
 - Opprettet: 15. juli 2026
-- Status: Første produkt- og teknologigrunnlag
+- Sist oppdatert: 16. juli 2026
+- Status: Oppdatert produkt-, album- og importgrunnlag
