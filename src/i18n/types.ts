@@ -41,8 +41,16 @@ export type TranslationDictionary = {
     photoLibraryBody: string;
     readyTitle: string;
     readyBody: string;
+    commentPlaceholder: string;
+    moodTitle: string;
+    albumTitle: string;
+    noAlbums: string;
+    saveButton: string;
+    saving: string;
     cameraPermissionError: string;
     importError: string;
+    albumLoadError: string;
+    saveError: string;
   };
 };
 
@@ -80,5 +88,13 @@ export type TranslationPath =
   | "memories.photoLibraryBody"
   | "memories.readyTitle"
   | "memories.readyBody"
+  | "memories.commentPlaceholder"
+  | "memories.moodTitle"
+  | "memories.albumTitle"
+  | "memories.noAlbums"
+  | "memories.saveButton"
+  | "memories.saving"
   | "memories.cameraPermissionError"
-  | "memories.importError";
+  | "memories.importError"
+  | "memories.albumLoadError"
+  | "memories.saveError";
