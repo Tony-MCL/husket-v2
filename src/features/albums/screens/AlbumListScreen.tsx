@@ -75,20 +75,10 @@ export function AlbumListScreen() {
           <Text style={[styles.eyebrow, { color: theme.colors.accent }]}> 
             {t("albums.eyebrow")}
           </Text>
-          <Text
-            style={[
-              styles.title,
-              { color: theme.colors.text, fontSize: theme.typography.title },
-            ]}
-          >
+          <Text style={[styles.title, { color: theme.colors.text, fontSize: theme.typography.title }]}>
             {t("albums.title")}
           </Text>
-          <Text
-            style={[
-              styles.body,
-              { color: theme.colors.textMuted, fontSize: theme.typography.body },
-            ]}
-          >
+          <Text style={[styles.body, { color: theme.colors.textMuted, fontSize: theme.typography.body }]}>
             {t("albums.body")}
           </Text>
         </View>
@@ -120,12 +110,7 @@ export function AlbumListScreen() {
             },
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: theme.colors.text, fontSize: theme.typography.heading },
-            ]}
-          >
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, fontSize: theme.typography.heading }]}>
             {t("albums.createTitle")}
           </Text>
 
@@ -185,12 +170,7 @@ export function AlbumListScreen() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <View style={{ gap: theme.spacing.md }}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: theme.colors.text, fontSize: theme.typography.heading },
-            ]}
-          >
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, fontSize: theme.typography.heading }]}>
             {t("albums.yourAlbums")}
           </Text>
 
@@ -207,15 +187,21 @@ export function AlbumListScreen() {
                 },
               ]}
             >
-              <Text style={[styles.body, { color: theme.colors.textMuted }]}> 
+              <Text style={[styles.body, { color: theme.colors.textMuted }]}>
                 {t("albums.empty")}
               </Text>
             </View>
           ) : (
             albums.map((album) => (
-              <View
+              <Pressable
                 key={album.id}
-                style={[
+                onPress={() =>
+                  router.push({
+                    pathname: "/albums/[albumId]",
+                    params: { albumId: album.id },
+                  })
+                }
+                style={({ pressed }) => [
                   styles.album,
                   {
                     backgroundColor: theme.colors.surface,
@@ -223,18 +209,22 @@ export function AlbumListScreen() {
                     borderRadius: theme.radii.lg,
                     padding: theme.spacing.lg,
                     gap: theme.spacing.xs,
+                    opacity: pressed ? 0.82 : 1,
                   },
                 ]}
               >
-                <Text style={[styles.albumTitle, { color: theme.colors.text }]}> 
+                <Text style={[styles.albumTitle, { color: theme.colors.text }]}>
                   {album.title}
                 </Text>
                 {album.description ? (
-                  <Text style={[styles.body, { color: theme.colors.textMuted }]}> 
+                  <Text style={[styles.body, { color: theme.colors.textMuted }]}>
                     {album.description}
                   </Text>
                 ) : null}
-              </View>
+                <Text style={[styles.openAlbum, { color: theme.colors.accent }]}>
+                  {t("albums.openAlbum")}
+                </Text>
+              </Pressable>
             ))
           )}
         </View>
@@ -259,4 +249,5 @@ const styles = StyleSheet.create({
   emptyState: { borderWidth: 1, borderStyle: "dashed" },
   album: { borderWidth: 1 },
   albumTitle: { fontSize: 20, fontWeight: "700" },
+  openAlbum: { fontWeight: "700", marginTop: 8 },
 });
