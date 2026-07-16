@@ -2,7 +2,7 @@
 // src/storage/key-value-store.web.ts
 // ===============================
 
-import type { KeyValueStore } from "./key-value-store";
+import type { KeyValueStore } from "./key-value-store.types";
 
 /** Weblagring med nettleserens localStorage. */
 export const keyValueStore: KeyValueStore = {
