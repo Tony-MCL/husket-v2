@@ -225,3 +225,83 @@ Vi ønsker å beholde begge muligheter mens den nye appen utvikles og testes.
 ### Konsekvens
 
 Endelige Android- og iOS-identifikatorer skal ikke låses før eksisterende appkonfigurasjon er undersøkt og publiseringsstrategien er bestemt.
+
+---
+
+## 16. juli 2026 – albumet er appens produktmessige hjerte
+
+### Beslutning
+
+Albumet skal være det viktigste produktområdet i husk'et v2.
+
+For utviklingen er albumet hjertet i appen. For brukeren er egne personlige minner hjertet i opplevelsen.
+
+### Begrunnelse
+
+Et vanlig bilderutenett finnes allerede i mange apper. husk'et skal gi brukeren følelsen av å bla i et personlig fotoalbum, samtidig som appen beholder moderne fordeler som oversikt, søk og rask navigasjon.
+
+### Konsekvens
+
+Albumopplevelsen skal prioriteres foran sekundære funksjoner og skal utvikles som mer enn et teknisk galleri.
+
+Datamodell, navigasjon og design skal støtte både små og store albumsamlinger over tid.
+
+---
+
+## 16. juli 2026 – mange kilder skal bruke én felles importflyt
+
+### Beslutning
+
+Kamera, bildebibliotek, mottatte husk'et, systemets delingsmeny og fremtidige kilder skal levere innhold gjennom én normalisert importflyt.
+
+### Begrunnelse
+
+Appen skal kunne hente minner fra flest mulig relevante kilder uten at albumet eller minnemodellen må bygges om hver gang en ny kilde legges til.
+
+### Konsekvens
+
+Hver kilde bygges som en separat adapter som leverer et felles midlertidig importformat.
+
+Etter arkivering skal kilden ikke bestemme hvordan minnet vises eller behandles i albumet.
+
+---
+
+## 16. juli 2026 – korte kommentarer og følelsesemoji videreføres
+
+### Beslutning
+
+Brukeren skal kunne legge til en kort, valgfri kommentar og en valgfri emoji på et minne.
+
+Emojien skal uttrykke følelsen eller stemningen i øyeblikket og skal ikke omtales som rating.
+
+### Begrunnelse
+
+Kommentar og emoji kan gi bildet personlig mening uten å gjøre lagringsflyten tung eller komplisert.
+
+### Konsekvens
+
+Begge feltene skal være valgfrie.
+
+Brukeren skal kunne arkivere et minne raskt uten å fylle ut metadata.
+
+Datamodellen skal bruke et begrep som følelse eller stemning, ikke rating.
+
+---
+
+## 16. juli 2026 – album erstatter kategorier i første versjon
+
+### Beslutning
+
+Synlige kategorier skal ikke inngå i første versjon av husk'et v2.
+
+Album skal være den primære organiseringen av minner.
+
+### Begrunnelse
+
+Når brukeren allerede velger album, kan kategorier føre til dobbel organisering og unødvendig arbeid ved arkivering.
+
+### Konsekvens
+
+Kategorisystemet fra husk'et v1 kopieres ikke inn i den nye appen.
+
+Datamodellen skal likevel kunne utvides med enkle merkelapper eller emneknagger senere dersom faktisk bruk viser et behov.
