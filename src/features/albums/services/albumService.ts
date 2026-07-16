@@ -45,3 +45,9 @@ export async function getAlbums(): Promise<Album[]> {
   const albums = await albumRepository.getAll();
   return [...albums].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
+
+/** Henter ett album eller null dersom det ikke finnes. */
+export async function getAlbumById(albumId: string): Promise<Album | null> {
+  if (!albumId) return null;
+  return albumRepository.getById(albumId);
+}
