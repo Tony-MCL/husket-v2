@@ -27,8 +27,16 @@ export type TranslationDictionary = {
     saving: string;
     yourAlbums: string;
     empty: string;
+    openAlbum: string;
     loadError: string;
     saveError: string;
+  };
+  albumDetail: {
+    eyebrow: string;
+    back: string;
+    empty: string;
+    loadError: string;
+    notFound: string;
   };
   memories: {
     eyebrow: string;
@@ -76,8 +84,14 @@ export type TranslationPath =
   | "albums.saving"
   | "albums.yourAlbums"
   | "albums.empty"
+  | "albums.openAlbum"
   | "albums.loadError"
   | "albums.saveError"
+  | "albumDetail.eyebrow"
+  | "albumDetail.back"
+  | "albumDetail.empty"
+  | "albumDetail.loadError"
+  | "albumDetail.notFound"
   | "memories.eyebrow"
   | "memories.title"
   | "memories.body"
