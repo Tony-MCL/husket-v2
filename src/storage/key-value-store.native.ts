@@ -4,7 +4,7 @@
 
 import Storage from "expo-sqlite/kv-store";
 
-import type { KeyValueStore } from "./key-value-store";
+import type { KeyValueStore } from "./key-value-store.types";
 
 /** Native lagring med SQLite via Expo. */
 export const keyValueStore: KeyValueStore = {
