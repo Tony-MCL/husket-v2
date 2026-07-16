@@ -16,7 +16,7 @@ export const no: TranslationDictionary = {
     structureBody: "Ruter, funksjoner, tema og språkstøtte er delt opp i små og tydelige filer.",
   },
   albums: {
-    eyebrow: "Sprint 1.6",
+    eyebrow: "Sprint 1.7",
     title: "Dine album",
     body: "Opprett album, bevar historiene og åpne dem igjen for å se minnene dine.",
     addMemory: "Legg til minne",
@@ -59,5 +59,18 @@ export const no: TranslationDictionary = {
     importError: "Bildet kunne ikke importeres. Prøv et annet bilde.",
     albumLoadError: "Albumene kunne ikke lastes.",
     saveError: "Minnet kunne ikke lagres.",
+  },
+  memoryDetail: {
+    eyebrow: "Minne",
+    title: "Rediger minne",
+    back: "Tilbake til album",
+    commentPlaceholder: "En kort kommentar om dette øyeblikket (valgfritt)",
+    moodTitle: "Hvordan føltes dette øyeblikket?",
+    albumTitle: "Album",
+    saveButton: "Lagre endringer",
+    saving: "Lagrer…",
+    loadError: "Minnet kunne ikke lastes.",
+    saveError: "Endringene kunne ikke lagres.",
+    notFound: "Minnet ble ikke funnet.",
   },
 };
