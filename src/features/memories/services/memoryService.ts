@@ -63,3 +63,17 @@ export async function createMemory(input: CreateMemoryInput): Promise<Memory> {
   await memoryRepository.save(memory);
   return memory;
 }
+
+/** Henter minnene i ett album i kronologisk rekkefølge. */
+export async function getMemoriesByAlbumId(albumId: string): Promise<Memory[]> {
+  if (!albumId) return [];
+
+  const memories = await memoryRepository.getAll();
+  return memories
+    .filter((memory) => memory.albumId === albumId)
+    .sort((a, b) => {
+      const aDate = a.capturedAt ?? a.createdAt;
+      const bDate = b.capturedAt ?? b.createdAt;
+      return aDate.localeCompare(bDate);
+    });
+}
