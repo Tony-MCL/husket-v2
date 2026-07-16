@@ -19,6 +19,9 @@ import type { Album } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { getAlbums } from "../../albums/services/albumService";
 
+const bookHeights = [174, 162, 186, 168, 180];
+const bookWidths = [56, 48, 62, 52, 58];
+
 export function LibraryScreen() {
   const { t } = useLanguage();
   const theme = useAppTheme();
@@ -48,6 +51,13 @@ export function LibraryScreen() {
     });
   }
 
+  function getBookColor(index: number) {
+    if (index % 4 === 0) return theme.colors.accent;
+    if (index % 4 === 1) return theme.colors.textMuted;
+    if (index % 4 === 2) return theme.colors.text;
+    return theme.colors.surfaceMuted;
+  }
+
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
@@ -56,41 +66,29 @@ export function LibraryScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingHorizontal: theme.spacing.lg,
-            paddingTop: theme.spacing.lg,
+            paddingHorizontal: theme.spacing.md,
+            paddingTop: theme.spacing.md,
             paddingBottom: theme.spacing.xl,
-            gap: theme.spacing.lg,
           },
         ]}
       >
-        <View style={{ gap: theme.spacing.xs }}>
+        <View style={[styles.heading, { paddingHorizontal: theme.spacing.sm }]}> 
           <Text style={[styles.eyebrow, { color: theme.colors.accent }]}> 
             {t("library.eyebrow")}
           </Text>
           <Text
             style={[
               styles.title,
-              { color: theme.colors.text, fontSize: theme.typography.title },
+              { color: theme.colors.text, fontSize: theme.typography.heading },
             ]}
           >
             {t("library.title")}
-          </Text>
-          <Text
-            style={[
-              styles.body,
-              {
-                color: theme.colors.textMuted,
-                fontSize: theme.typography.body,
-              },
-            ]}
-          >
-            {t("library.body")}
           </Text>
         </View>
 
         <View
           style={[
-            styles.bookshelf,
+            styles.cabinet,
             {
               borderColor: theme.colors.border,
               backgroundColor: theme.colors.surface,
@@ -98,120 +96,199 @@ export function LibraryScreen() {
             },
           ]}
         >
-          <View style={[styles.topSurface, { borderBottomColor: theme.colors.border }]}> 
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t("library.camera")}
-              onPress={() =>
-                router.push({ pathname: "/add-memory", params: { source: "camera" } })
-              }
-              style={({ pressed }) => [
-                styles.object,
-                { opacity: pressed ? 0.72 : 1 },
-              ]}
-            >
-              <Text style={styles.cameraIcon}>📷</Text>
-              <Text style={[styles.objectLabel, { color: theme.colors.text }]}> 
-                {t("library.camera")}
-              </Text>
-            </Pressable>
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t("library.photoFrame")}
-              onPress={() =>
-                router.push({
-                  pathname: "/add-memory",
-                  params: { source: "photo-library" },
-                })
-              }
-              style={({ pressed }) => [
-                styles.object,
-                { opacity: pressed ? 0.72 : 1 },
-              ]}
-            >
-              <View
-                style={[
-                  styles.photoFrame,
-                  {
-                    borderColor: theme.colors.accent,
-                    backgroundColor: theme.colors.background,
-                  },
-                ]}
-              >
-                <Text style={styles.photoIcon}>🖼️</Text>
-              </View>
-              <Text style={[styles.objectLabel, { color: theme.colors.text }]}> 
-                {t("library.photoFrame")}
-              </Text>
-            </Pressable>
-          </View>
-
-          <View style={[styles.shelf, { borderBottomColor: theme.colors.border }]}> 
-            {isLoading ? (
-              <ActivityIndicator color={theme.colors.accent} />
-            ) : error ? (
-              <Text style={styles.error}>{error}</Text>
-            ) : albums.length === 0 ? (
+          <View
+            style={[
+              styles.backPanel,
+              { backgroundColor: theme.colors.surfaceMuted },
+            ]}
+          >
+            <View style={styles.topObjects}>
               <Pressable
-                onPress={() => router.push("/albums")}
+                accessibilityRole="button"
+                accessibilityLabel={t("library.camera")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/add-memory",
+                    params: { source: "camera" },
+                  })
+                }
                 style={({ pressed }) => [
-                  styles.emptyBook,
-                  {
-                    borderColor: theme.colors.border,
-                    opacity: pressed ? 0.72 : 1,
-                  },
+                  styles.object,
+                  { opacity: pressed ? 0.68 : 1 },
                 ]}
               >
-                <Text style={[styles.emptyTitle, { color: theme.colors.text }]}> 
-                  {t("library.emptyTitle")}
-                </Text>
-                <Text style={[styles.emptyBody, { color: theme.colors.textMuted }]}> 
-                  {t("library.emptyBody")}
-                </Text>
-              </Pressable>
-            ) : (
-              <View style={styles.bookRow}>
-                {albums.map((album, index) => (
-                  <Pressable
-                    key={album.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={album.title}
-                    onPress={() => openAlbum(album.id)}
-                    style={({ pressed }) => [
-                      styles.book,
+                <View
+                  style={[
+                    styles.cameraBody,
+                    {
+                      backgroundColor: theme.colors.text,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.cameraTop,
+                      { backgroundColor: theme.colors.textMuted },
+                    ]}
+                  />
+                  <View
+                    style={[
+                      styles.cameraLens,
                       {
-                        backgroundColor:
-                          index % 3 === 0
-                            ? theme.colors.accent
-                            : index % 3 === 1
-                              ? theme.colors.textMuted
-                              : theme.colors.text,
-                        borderColor: theme.colors.border,
-                        opacity: pressed ? 0.76 : 1,
+                        backgroundColor: theme.colors.background,
+                        borderColor: theme.colors.textMuted,
                       },
                     ]}
                   >
-                    <Text numberOfLines={3} style={styles.bookTitle}>
-                      {album.title}
+                    <View
+                      style={[
+                        styles.cameraLensInner,
+                        { backgroundColor: theme.colors.accent },
+                      ]}
+                    />
+                  </View>
+                </View>
+                <Text style={[styles.objectLabel, { color: theme.colors.text }]}> 
+                  {t("library.camera")}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t("library.photoFrame")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/add-memory",
+                    params: { source: "photo-library" },
+                  })
+                }
+                style={({ pressed }) => [
+                  styles.object,
+                  { opacity: pressed ? 0.68 : 1 },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.photoFrame,
+                    {
+                      borderColor: theme.colors.textMuted,
+                      backgroundColor: theme.colors.background,
+                    },
+                  ]}
+                >
+                  <View style={styles.framePicture}>
+                    <View
+                      style={[
+                        styles.frameSun,
+                        { backgroundColor: theme.colors.accent },
+                      ]}
+                    />
+                    <View
+                      style={[
+                        styles.frameHillBack,
+                        { backgroundColor: theme.colors.surfaceMuted },
+                      ]}
+                    />
+                    <View
+                      style={[
+                        styles.frameHillFront,
+                        { backgroundColor: theme.colors.textMuted },
+                      ]}
+                    />
+                  </View>
+                </View>
+                <Text style={[styles.objectLabel, { color: theme.colors.text }]}> 
+                  {t("library.photoFrame")}
+                </Text>
+              </Pressable>
+            </View>
+
+            <View
+              style={[
+                styles.topBoard,
+                {
+                  backgroundColor: theme.colors.textMuted,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            />
+
+            <View style={styles.shelfArea}>
+              {isLoading ? (
+                <ActivityIndicator color={theme.colors.accent} />
+              ) : error ? (
+                <Text style={styles.error}>{error}</Text>
+              ) : (
+                <View style={styles.bookRow}>
+                  {albums.map((album, index) => {
+                    const bookHeight = bookHeights[index % bookHeights.length];
+                    const bookWidth = bookWidths[index % bookWidths.length];
+                    const bookColor = getBookColor(index);
+
+                    return (
+                      <Pressable
+                        key={album.id}
+                        accessibilityRole="button"
+                        accessibilityLabel={album.title}
+                        onPress={() => openAlbum(album.id)}
+                        style={({ pressed }) => [
+                          styles.book,
+                          {
+                            width: bookWidth,
+                            height: bookHeight,
+                            backgroundColor: bookColor,
+                            borderColor: theme.colors.border,
+                            opacity: pressed ? 0.72 : 1,
+                            transform: [{ translateY: pressed ? 2 : 0 }],
+                          },
+                        ]}
+                      >
+                        <View style={styles.bookBandTop} />
+                        <Text numberOfLines={1} style={styles.bookTitle}>
+                          {album.title}
+                        </Text>
+                        <View style={styles.bookBandBottom} />
+                      </Pressable>
+                    );
+                  })}
+
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t("library.manageAlbums")}
+                    onPress={() => router.push("/albums")}
+                    style={({ pressed }) => [
+                      styles.addBook,
+                      {
+                        borderColor: theme.colors.border,
+                        backgroundColor: theme.colors.background,
+                        opacity: pressed ? 0.68 : 1,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.addBookPlus, { color: theme.colors.accent }]}>+
                     </Text>
                   </Pressable>
-                ))}
-              </View>
-            )}
-          </View>
+                </View>
+              )}
 
-          <Pressable
-            onPress={() => router.push("/albums")}
-            style={({ pressed }) => [
-              styles.manageAlbums,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <Text style={[styles.manageAlbumsText, { color: theme.colors.accent }]}> 
-              {t("library.manageAlbums")}
-            </Text>
-          </Pressable>
+              {!isLoading && !error && albums.length === 0 ? (
+                <Text style={[styles.emptyHint, { color: theme.colors.textMuted }]}> 
+                  {t("library.emptyBody")}
+                </Text>
+              ) : null}
+            </View>
+
+            <View
+              style={[
+                styles.shelfBoard,
+                {
+                  backgroundColor: theme.colors.textMuted,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -221,84 +298,153 @@ export function LibraryScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { width: "100%", maxWidth: 760, alignSelf: "center" },
+  heading: { marginBottom: 12, gap: 2 },
   eyebrow: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: "700",
-    letterSpacing: 1.2,
+    letterSpacing: 1.4,
     textTransform: "uppercase",
   },
   title: { fontWeight: "800" },
-  body: { lineHeight: 24, maxWidth: 560 },
-  bookshelf: { overflow: "hidden", borderWidth: 1 },
-  topSurface: {
-    minHeight: 170,
-    borderBottomWidth: 8,
+  cabinet: {
+    overflow: "hidden",
+    borderWidth: 1,
+    padding: 10,
+  },
+  backPanel: {
+    minHeight: 430,
+    borderRadius: 14,
+    overflow: "hidden",
+  },
+  topObjects: {
+    minHeight: 145,
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-evenly",
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 14,
+    paddingHorizontal: 28,
+    paddingTop: 22,
+    paddingBottom: 12,
   },
-  object: { minWidth: 112, alignItems: "center", gap: 8 },
-  cameraIcon: { fontSize: 64 },
-  photoFrame: {
-    width: 88,
-    height: 72,
-    borderWidth: 7,
+  object: { minWidth: 104, alignItems: "center", gap: 8 },
+  objectLabel: { fontSize: 12, fontWeight: "700" },
+  cameraBody: {
+    width: 76,
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+  },
+  cameraTop: {
+    position: "absolute",
+    top: -7,
+    left: 13,
+    width: 26,
+    height: 9,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+  },
+  cameraLens: {
+    width: 31,
+    height: 31,
+    borderRadius: 16,
+    borderWidth: 3,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cameraLensInner: { width: 13, height: 13, borderRadius: 7 },
+  photoFrame: {
+    width: 76,
+    height: 64,
+    borderWidth: 7,
+    padding: 4,
     transform: [{ rotate: "-2deg" }],
   },
-  photoIcon: { fontSize: 38 },
-  objectLabel: { fontSize: 14, fontWeight: "700" },
-  shelf: {
-    minHeight: 250,
-    borderBottomWidth: 12,
+  framePicture: { flex: 1, overflow: "hidden", position: "relative" },
+  frameSun: {
+    position: "absolute",
+    right: 7,
+    top: 6,
+    width: 11,
+    height: 11,
+    borderRadius: 6,
+  },
+  frameHillBack: {
+    position: "absolute",
+    left: -8,
+    right: -8,
+    bottom: -18,
+    height: 38,
+    borderRadius: 30,
+    transform: [{ rotate: "7deg" }],
+  },
+  frameHillFront: {
+    position: "absolute",
+    left: -10,
+    right: -10,
+    bottom: -24,
+    height: 42,
+    borderRadius: 34,
+    transform: [{ rotate: "-8deg" }],
+  },
+  topBoard: { height: 10, borderTopWidth: 1, borderBottomWidth: 1 },
+  shelfArea: {
+    minHeight: 235,
     justifyContent: "flex-end",
-    paddingHorizontal: 20,
-    paddingTop: 28,
+    paddingHorizontal: 16,
+    paddingTop: 26,
   },
   bookRow: {
-    minHeight: 210,
+    minHeight: 190,
     flexDirection: "row",
     alignItems: "flex-end",
-    flexWrap: "wrap",
-    gap: 8,
+    gap: 5,
   },
   book: {
-    width: 54,
-    minHeight: 172,
     borderWidth: 1,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+    justifyContent: "space-between",
+    paddingVertical: 8,
+  },
+  bookBandTop: {
+    width: "100%",
+    height: 2,
+    backgroundColor: "#ffffff40",
+  },
+  bookBandBottom: {
+    width: "100%",
+    height: 2,
+    backgroundColor: "#ffffff40",
   },
   bookTitle: {
     color: "#ffffff",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
-    lineHeight: 15,
+    lineHeight: 14,
     textAlign: "center",
     transform: [{ rotate: "-90deg" }],
-    width: 142,
+    width: 126,
   },
-  emptyBook: {
-    minHeight: 150,
+  addBook: {
+    width: 42,
+    height: 112,
     borderWidth: 1,
     borderStyle: "dashed",
-    borderRadius: 8,
-    justifyContent: "center",
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
     alignItems: "center",
-    padding: 24,
-    marginBottom: 18,
+    justifyContent: "center",
   },
-  emptyTitle: { fontSize: 18, fontWeight: "700", textAlign: "center" },
-  emptyBody: { marginTop: 6, lineHeight: 21, textAlign: "center" },
-  manageAlbums: { alignItems: "center", padding: 16 },
-  manageAlbumsText: { fontWeight: "700" },
+  addBookPlus: { fontSize: 28, fontWeight: "400", lineHeight: 30 },
+  emptyHint: {
+    marginTop: 12,
+    marginBottom: 10,
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: "center",
+  },
+  shelfBoard: { height: 13, borderTopWidth: 1, borderBottomWidth: 1 },
   error: { color: "#b42318", fontWeight: "600", marginBottom: 20 },
 });
