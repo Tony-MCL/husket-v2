@@ -11,4 +11,20 @@ export type KeyValueStore = {
   removeItem(key: string): Promise<void>;
 };
 
-export { keyValueStore } from "./key-value-store.native";
+const memoryFallback = new Map<string, string>();
+
+/**
+ * Generisk fallback brukt av TypeScript og miljøer uten plattformfil.
+ * Metro velger .native.ts eller .web.ts når appen kjøres.
+ */
+export const keyValueStore: KeyValueStore = {
+  async getItem(key) {
+    return memoryFallback.get(key) ?? null;
+  },
+  async setItem(key, value) {
+    memoryFallback.set(key, value);
+  },
+  async removeItem(key) {
+    memoryFallback.delete(key);
+  },
+};
