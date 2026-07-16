@@ -2,6 +2,7 @@
 // src/features/albums/screens/AlbumListScreen.tsx
 // ===============================
 
+import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -92,6 +93,21 @@ export function AlbumListScreen() {
           </Text>
         </View>
 
+        <Pressable
+          onPress={() => router.push("/add-memory")}
+          style={({ pressed }) => [
+            styles.primaryButton,
+            {
+              backgroundColor: theme.colors.accent,
+              borderRadius: theme.radii.md,
+              opacity: pressed ? 0.8 : 1,
+              padding: theme.spacing.md,
+            },
+          ]}
+        >
+          <Text style={styles.buttonText}>{t("albums.addMemory")}</Text>
+        </Pressable>
+
         <View
           style={[
             styles.panel,
@@ -151,7 +167,7 @@ export function AlbumListScreen() {
             disabled={!title.trim() || isSaving}
             onPress={() => void handleCreateAlbum()}
             style={({ pressed }) => [
-              styles.button,
+              styles.primaryButton,
               {
                 backgroundColor: theme.colors.accent,
                 borderRadius: theme.radii.md,
@@ -237,7 +253,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontWeight: "700" },
   input: { borderWidth: 1, fontSize: 16 },
   descriptionInput: { minHeight: 96, textAlignVertical: "top" },
-  button: { alignItems: "center" },
+  primaryButton: { alignItems: "center" },
   buttonText: { color: "#ffffff", fontSize: 16, fontWeight: "700" },
   error: { color: "#b42318", fontWeight: "600" },
   emptyState: { borderWidth: 1, borderStyle: "dashed" },
