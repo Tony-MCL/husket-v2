@@ -15,4 +15,18 @@ export const no: TranslationDictionary = {
     structureTitle: "Bygd for å vokse",
     structureBody: "Ruter, funksjoner, tema og språkstøtte er delt opp i små og tydelige filer.",
   },
+  albums: {
+    eyebrow: "Sprint 1.3",
+    title: "Dine album",
+    body: "Opprett det første albumet og lagre tittel og historie lokalt på denne enheten.",
+    createTitle: "Opprett album",
+    titlePlaceholder: "Navn på album",
+    descriptionPlaceholder: "En kort introduksjon eller historie for albumet (valgfritt)",
+    createButton: "Opprett album",
+    saving: "Lagrer…",
+    yourAlbums: "Lagrede album",
+    empty: "Ingen album ennå. Opprett det første ovenfor.",
+    loadError: "Albumene kunne ikke lastes.",
+    saveError: "Albumet kunne ikke lagres.",
+  },
 };
