@@ -16,9 +16,9 @@ export const no: TranslationDictionary = {
     structureBody: "Ruter, funksjoner, tema og språkstøtte er delt opp i små og tydelige filer.",
   },
   albums: {
-    eyebrow: "Sprint 1.3",
+    eyebrow: "Sprint 1.6",
     title: "Dine album",
-    body: "Opprett album og lagre tittel og historie lokalt på denne enheten.",
+    body: "Opprett album, bevar historiene og åpne dem igjen for å se minnene dine.",
     addMemory: "Legg til minne",
     createTitle: "Opprett album",
     titlePlaceholder: "Navn på album",
@@ -27,8 +27,16 @@ export const no: TranslationDictionary = {
     saving: "Lagrer…",
     yourAlbums: "Lagrede album",
     empty: "Ingen album ennå. Opprett det første ovenfor.",
+    openAlbum: "Åpne album",
     loadError: "Albumene kunne ikke lastes.",
     saveError: "Albumet kunne ikke lagres.",
+  },
+  albumDetail: {
+    eyebrow: "Album",
+    back: "Tilbake til album",
+    empty: "Dette albumet har ingen minner ennå.",
+    loadError: "Albumet kunne ikke lastes.",
+    notFound: "Albumet ble ikke funnet.",
   },
   memories: {
     eyebrow: "Sprint 1.5",
