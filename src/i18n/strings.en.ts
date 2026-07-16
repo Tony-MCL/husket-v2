@@ -14,9 +14,9 @@ export const en = {
     structureBody: "Routes, features, theme and language support are separated into small, focused files.",
   },
   albums: {
-    eyebrow: "Sprint 1.3",
+    eyebrow: "Sprint 1.6",
     title: "Your albums",
-    body: "Create albums and keep their titles and stories locally on this device.",
+    body: "Create albums, preserve their stories, and open them to revisit your memories.",
     addMemory: "Add memory",
     createTitle: "Create album",
     titlePlaceholder: "Album title",
@@ -25,8 +25,16 @@ export const en = {
     saving: "Saving…",
     yourAlbums: "Saved albums",
     empty: "No albums yet. Create the first one above.",
+    openAlbum: "Open album",
     loadError: "The albums could not be loaded.",
     saveError: "The album could not be saved.",
+  },
+  albumDetail: {
+    eyebrow: "Album",
+    back: "Back to albums",
+    empty: "This album has no memories yet.",
+    loadError: "The album could not be loaded.",
+    notFound: "The album could not be found.",
   },
   memories: {
     eyebrow: "Sprint 1.5",
