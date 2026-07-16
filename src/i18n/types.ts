@@ -1,9 +1,7 @@
 export type SupportedLanguage = "en" | "no";
 
 export type TranslationDictionary = {
-  app: {
-    name: string;
-  };
+  app: { name: string };
   foundation: {
     eyebrow: string;
     title: string;
@@ -60,55 +58,25 @@ export type TranslationDictionary = {
     albumLoadError: string;
     saveError: string;
   };
+  memoryDetail: {
+    eyebrow: string;
+    title: string;
+    back: string;
+    commentPlaceholder: string;
+    moodTitle: string;
+    albumTitle: string;
+    saveButton: string;
+    saving: string;
+    loadError: string;
+    saveError: string;
+    notFound: string;
+  };
 };
 
 export type TranslationPath =
   | "app.name"
-  | "foundation.eyebrow"
-  | "foundation.title"
-  | "foundation.body"
-  | "foundation.albumTitle"
-  | "foundation.albumBody"
-  | "foundation.languageTitle"
-  | "foundation.languageBody"
-  | "foundation.structureTitle"
-  | "foundation.structureBody"
-  | "albums.eyebrow"
-  | "albums.title"
-  | "albums.body"
-  | "albums.addMemory"
-  | "albums.createTitle"
-  | "albums.titlePlaceholder"
-  | "albums.descriptionPlaceholder"
-  | "albums.createButton"
-  | "albums.saving"
-  | "albums.yourAlbums"
-  | "albums.empty"
-  | "albums.openAlbum"
-  | "albums.loadError"
-  | "albums.saveError"
-  | "albumDetail.eyebrow"
-  | "albumDetail.back"
-  | "albumDetail.empty"
-  | "albumDetail.loadError"
-  | "albumDetail.notFound"
-  | "memories.eyebrow"
-  | "memories.title"
-  | "memories.body"
-  | "memories.back"
-  | "memories.camera"
-  | "memories.cameraBody"
-  | "memories.photoLibrary"
-  | "memories.photoLibraryBody"
-  | "memories.readyTitle"
-  | "memories.readyBody"
-  | "memories.commentPlaceholder"
-  | "memories.moodTitle"
-  | "memories.albumTitle"
-  | "memories.noAlbums"
-  | "memories.saveButton"
-  | "memories.saving"
-  | "memories.cameraPermissionError"
-  | "memories.importError"
-  | "memories.albumLoadError"
-  | "memories.saveError";
+  | `foundation.${keyof TranslationDictionary["foundation"]}`
+  | `albums.${keyof TranslationDictionary["albums"]}`
+  | `albumDetail.${keyof TranslationDictionary["albumDetail"]}`
+  | `memories.${keyof TranslationDictionary["memories"]}`
+  | `memoryDetail.${keyof TranslationDictionary["memoryDetail"]}`;
