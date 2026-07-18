@@ -304,8 +304,9 @@ const styles = StyleSheet.create({
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
   bookshelf: {
-    width: "100%",
+    width: "124%",
     aspectRatio: 2 / 3,
+    alignSelf: "center",
     position: "relative",
   },
   bookshelfImage: {
