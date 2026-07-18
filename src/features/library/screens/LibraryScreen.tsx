@@ -27,8 +27,8 @@ import {
 } from "../libraryAssets";
 
 const BOOKS_PER_SHELF = 5;
-const BOOK_SHELF_TOPS = [30.7, 48.9, 67.2, 85.2];
-const BOOK_LEFT_POSITIONS = [12.2, 27.1, 42, 56.9, 71.8];
+const BOOK_SHELF_TOPS = [29, 47.2, 65.5, 83.5];
+const BOOK_LEFT_POSITIONS = [10.5, 26, 41.5, 57, 72.5];
 
 export function LibraryScreen() {
   const { t } = useLanguage();
@@ -108,12 +108,7 @@ export function LibraryScreen() {
         </View>
 
         <View style={styles.libraryStage}>
-          <ImageBackground
-            source={bookshelfAssets.oak}
-            resizeMode="contain"
-            style={styles.bookshelf}
-            imageStyle={styles.bookshelfImage}
-          >
+          <View style={styles.topObjects}>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t("library.camera")}
@@ -149,13 +144,22 @@ export function LibraryScreen() {
                 pressed ? styles.pressedObject : null,
               ]}
             >
-              <Image
-                source={libraryObjectAssets.pictureFrames.oak}
-                resizeMode="contain"
-                style={styles.objectImage}
-              />
+              <View style={styles.frameCrop}>
+                <Image
+                  source={libraryObjectAssets.pictureFrames.oak}
+                  resizeMode="cover"
+                  style={styles.frameImage}
+                />
+              </View>
             </Pressable>
+          </View>
 
+          <ImageBackground
+            source={bookshelfAssets.oak}
+            resizeMode="contain"
+            style={styles.bookshelf}
+            imageStyle={styles.bookshelfImage}
+          >
             {isLoading ? (
               <View style={styles.statusOverlay}>
                 <ActivityIndicator color={theme.colors.accent} />
@@ -180,16 +184,18 @@ export function LibraryScreen() {
                       pressed ? styles.pressedBook : null,
                     ]}
                   >
-                    <Image
-                      source={albumSpineAssets[index % albumSpineAssets.length]}
-                      resizeMode="stretch"
-                      style={styles.bookImage}
-                    />
+                    <View style={styles.bookCrop}>
+                      <Image
+                        source={albumSpineAssets[index % albumSpineAssets.length]}
+                        resizeMode="cover"
+                        style={styles.bookImage}
+                      />
+                    </View>
                     <View style={styles.bookLabelArea} pointerEvents="none">
                       <Text
                         numberOfLines={1}
                         adjustsFontSizeToFit
-                        minimumFontScale={0.58}
+                        minimumFontScale={0.62}
                         style={styles.bookTitle}
                       >
                         {album.title}
@@ -208,11 +214,13 @@ export function LibraryScreen() {
                     pressed ? styles.pressedBook : null,
                   ]}
                 >
-                  <Image
-                    source={albumSpineAssets[addBookIndex % albumSpineAssets.length]}
-                    resizeMode="stretch"
-                    style={styles.bookImage}
-                  />
+                  <View style={styles.bookCrop}>
+                    <Image
+                      source={albumSpineAssets[addBookIndex % albumSpineAssets.length]}
+                      resizeMode="cover"
+                      style={styles.bookImage}
+                    />
+                  </View>
                   <View style={styles.bookLabelArea} pointerEvents="none">
                     <Text style={styles.addBookPlus}>+</Text>
                   </View>
@@ -256,6 +264,44 @@ const styles = StyleSheet.create({
   libraryStage: {
     width: "100%",
     alignItems: "center",
+    position: "relative",
+  },
+  topObjects: {
+    width: "88%",
+    height: 88,
+    marginBottom: -12,
+    zIndex: 5,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    gap: 28,
+  },
+  cameraObject: {
+    width: 92,
+    height: 68,
+  },
+  frameObject: {
+    width: 82,
+    height: 76,
+  },
+  objectImage: {
+    width: "100%",
+    height: "100%",
+  },
+  frameCrop: {
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+  },
+  frameImage: {
+    width: "124%",
+    height: "124%",
+    left: "-12%",
+    top: "-12%",
+  },
+  pressedObject: {
+    opacity: 0.76,
+    transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
   bookshelf: {
     width: "100%",
@@ -266,68 +312,52 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  cameraObject: {
-    position: "absolute",
-    left: "13%",
-    top: "9.5%",
-    width: "22%",
-    height: "12.5%",
-    zIndex: 4,
-  },
-  frameObject: {
-    position: "absolute",
-    left: "42%",
-    top: "8.2%",
-    width: "20%",
-    height: "14.5%",
-    zIndex: 4,
-  },
-  objectImage: {
-    width: "100%",
-    height: "100%",
-  },
-  pressedObject: {
-    opacity: 0.76,
-    transform: [{ translateY: 2 }, { scale: 0.98 }],
-  },
   albumBook: {
     position: "absolute",
-    width: "12.8%",
-    height: "14.8%",
+    width: "14.5%",
+    height: "16.5%",
     zIndex: 3,
   },
   pressedBook: {
     opacity: 0.78,
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
-  bookImage: {
+  bookCrop: {
     position: "absolute",
     width: "100%",
     height: "100%",
+    overflow: "hidden",
+  },
+  bookImage: {
+    position: "absolute",
+    width: "128%",
+    height: "104%",
+    left: "-14%",
+    top: "-2%",
   },
   bookLabelArea: {
     position: "absolute",
-    left: "21%",
-    top: "29%",
-    width: "58%",
-    height: "37%",
+    left: "19%",
+    top: "28%",
+    width: "62%",
+    height: "39%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
   bookTitle: {
-    width: 92,
+    width: 108,
     color: "#332317",
-    fontSize: 9,
-    lineHeight: 11,
+    fontSize: 11,
+    lineHeight: 13,
     fontWeight: "800",
     textAlign: "center",
     transform: [{ rotate: "-90deg" }],
   },
   addBookPlus: {
     color: "#332317",
-    fontSize: 25,
-    lineHeight: 27,
+    fontSize: 29,
+    lineHeight: 31,
     fontWeight: "500",
   },
   statusOverlay: {
