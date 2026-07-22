@@ -40,10 +40,10 @@ export async function createAlbum(input: CreateAlbumInput): Promise<Album> {
   return album;
 }
 
-/** Henter alle album, nyeste først. */
+/** Henter alle album i opprettelsesrekkefølge, eldste først. */
 export async function getAlbums(): Promise<Album[]> {
   const albums = await albumRepository.getAll();
-  return [...albums].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return [...albums].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
 /** Henter ett album eller null dersom det ikke finnes. */
