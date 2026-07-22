@@ -28,16 +28,12 @@ export type TranslationDictionary = {
     eyebrow: string;
     title: string;
     body: string;
-    addMemory: string;
+    back: string;
     createTitle: string;
     titlePlaceholder: string;
     descriptionPlaceholder: string;
     createButton: string;
     saving: string;
-    yourAlbums: string;
-    empty: string;
-    openAlbum: string;
-    loadError: string;
     saveError: string;
   };
   albumDetail: {
