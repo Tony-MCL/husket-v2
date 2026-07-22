@@ -12,6 +12,8 @@ export const bookshelfAssets = {
   walnut: require("../../../assets/bookshelf-walnut.png"),
 } satisfies Record<string, ImageSourcePropType>;
 
+export const libraryWallAsset = require("../../../assets/library-wall.png") as ImageSourcePropType;
+
 export const libraryObjectAssets = {
   camera: require("../../../assets/camera.png"),
   mail: require("../../../assets/mail.png"),
