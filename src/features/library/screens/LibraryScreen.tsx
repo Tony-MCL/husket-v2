@@ -9,17 +9,15 @@ import {
   Image,
   ImageBackground,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLanguage } from "../../../i18n/LanguageProvider";
 import type { Album } from "../../../models";
-import { useAppTheme } from "../../../theme/useAppTheme";
 import { getAlbums } from "../../albums/services/albumService";
 import {
   albumSpineAssets,
@@ -28,16 +26,15 @@ import {
 } from "../libraryAssets";
 
 const BOOKS_PER_SHELF = 5;
-const BOOK_SHELF_TOPS = [26.8, 46.2, 65.6, 84.4];
-const BOOK_LEFT_POSITIONS = [8.5, 25.5, 42.5, 59.5, 76.5];
-const WALL_ASPECT_RATIO = 2 / 3;
-const MAX_WALL_WIDTH = 620;
-const SCREEN_HORIZONTAL_PADDING = 12;
-const RESERVED_VERTICAL_SPACE = 104;
+const ALBUM_SHELF_TOPS = [14.1, 28.4, 42.7, 57];
+const BOOK_LEFT_POSITIONS = [8.5, 24, 39.5, 55, 70.5];
+const WALL_ASPECT_RATIO = 1024 / 1792;
+const LIGHT_WALL_TEXT = "#30251F";
+const LIGHT_WALL_MUTED_TEXT = "#6A574D";
 
 export function LibraryScreen() {
   const { t } = useLanguage();
-  const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [albums, setAlbums] = useState<Album[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,30 +56,35 @@ export function LibraryScreen() {
   }, [loadAlbums]);
 
   const visibleAlbums = useMemo(
-    () => albums.slice(0, BOOKS_PER_SHELF * BOOK_SHELF_TOPS.length),
+    () => albums.slice(0, BOOKS_PER_SHELF * ALBUM_SHELF_TOPS.length),
     [albums],
   );
 
-  const wallDimensions = useMemo(() => {
-    const widthLimitedByScreen = Math.max(
-      280,
-      screenWidth - SCREEN_HORIZONTAL_PADDING * 2,
-    );
-    const heightAvailable = Math.max(460, screenHeight - RESERVED_VERTICAL_SPACE);
-    const widthLimitedByHeight = heightAvailable * WALL_ASPECT_RATIO;
-    const wallWidth = Math.min(
-      widthLimitedByScreen,
-      widthLimitedByHeight,
-      MAX_WALL_WIDTH,
-    );
+  const wallLayout = useMemo(() => {
+    const screenAspectRatio = screenWidth / screenHeight;
+
+    if (screenAspectRatio > WALL_ASPECT_RATIO) {
+      const renderedWidth = screenWidth;
+      const renderedHeight = renderedWidth / WALL_ASPECT_RATIO;
+
+      return {
+        width: renderedWidth,
+        height: renderedHeight,
+        left: 0,
+        top: (screenHeight - renderedHeight) / 2,
+      };
+    }
+
+    const renderedHeight = screenHeight;
+    const renderedWidth = renderedHeight * WALL_ASPECT_RATIO;
 
     return {
-      width: wallWidth,
-      height: wallWidth / WALL_ASPECT_RATIO,
+      width: renderedWidth,
+      height: renderedHeight,
+      left: (screenWidth - renderedWidth) / 2,
+      top: 0,
     };
   }, [screenHeight, screenWidth]);
-
-  const objectScale = wallDimensions.width / 420;
 
   function openAlbum(albumId: string) {
     router.push({
@@ -97,245 +99,217 @@ export function LibraryScreen() {
 
     return {
       left: `${BOOK_LEFT_POSITIONS[slotIndex]}%` as const,
-      top: `${BOOK_SHELF_TOPS[shelfIndex]}%` as const,
+      top: `${ALBUM_SHELF_TOPS[shelfIndex]}%` as const,
     };
   }
 
   const addBookIndex = Math.min(
     visibleAlbums.length,
-    BOOKS_PER_SHELF * BOOK_SHELF_TOPS.length - 1,
+    BOOKS_PER_SHELF * ALBUM_SHELF_TOPS.length - 1,
   );
 
   return (
-    <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
-    >
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
+    <View style={styles.screen}>
+      <ImageBackground
+        source={libraryWallAsset}
+        resizeMode="cover"
+        style={styles.background}
+        imageStyle={styles.backgroundImage}
+      />
+
+      <View
+        pointerEvents="box-none"
+        style={[
+          styles.wallCoordinateSpace,
           {
-            paddingTop: theme.spacing.sm,
-            paddingBottom: theme.spacing.xl,
+            width: wallLayout.width,
+            height: wallLayout.height,
+            left: wallLayout.left,
+            top: wallLayout.top,
           },
         ]}
-        showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.heading, { width: wallDimensions.width }]}> 
-          <Text style={[styles.eyebrow, { color: theme.colors.accent }]}> 
-            {t("library.eyebrow")}
-          </Text>
-          <Text
-            style={[
-              styles.title,
-              { color: theme.colors.text, fontSize: theme.typography.heading },
-            ]}
-          >
-            {t("library.title")}
-          </Text>
-        </View>
-
         <View
+          pointerEvents="none"
           style={[
-            styles.libraryStage,
+            styles.heading,
             {
-              width: wallDimensions.width,
+              top: Math.max(12, insets.top - wallLayout.top + 4),
             },
           ]}
         >
-          <View
-            style={[
-              styles.topObjects,
-              {
-                height: 88 * objectScale,
-                marginBottom: -18 * objectScale,
-                gap: 28 * objectScale,
-              },
-            ]}
-          >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t("library.camera")}
-              onPress={() =>
-                router.push({
-                  pathname: "/add-memory",
-                  params: { source: "camera" },
-                })
-              }
-              style={({ pressed }) => [
-                styles.cameraObject,
-                {
-                  width: 92 * objectScale,
-                  height: 68 * objectScale,
-                },
-                pressed ? styles.pressedObject : null,
-              ]}
-            >
-              <Image
-                source={libraryObjectAssets.camera}
-                resizeMode="contain"
-                style={styles.objectImage}
-              />
-            </Pressable>
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t("library.photoFrame")}
-              onPress={() =>
-                router.push({
-                  pathname: "/add-memory",
-                  params: { source: "photo-library" },
-                })
-              }
-              style={({ pressed }) => [
-                styles.frameObject,
-                {
-                  width: 82 * objectScale,
-                  height: 76 * objectScale,
-                },
-                pressed ? styles.pressedObject : null,
-              ]}
-            >
-              <View style={styles.frameCrop}>
-                <Image
-                  source={libraryObjectAssets.pictureFrames.oak}
-                  resizeMode="cover"
-                  style={styles.frameImage}
-                />
-              </View>
-            </Pressable>
-          </View>
-
-          <ImageBackground
-            source={libraryWallAsset}
-            resizeMode="cover"
-            style={[
-              styles.libraryWall,
-              {
-                width: wallDimensions.width,
-                height: wallDimensions.height,
-              },
-            ]}
-            imageStyle={styles.libraryWallImage}
-          >
-            {isLoading ? (
-              <View style={styles.statusOverlay}>
-                <ActivityIndicator color={theme.colors.accent} />
-              </View>
-            ) : error ? (
-              <View style={styles.statusOverlay}>
-                <Text style={[styles.statusText, { color: theme.colors.text }]}> 
-                  {error}
-                </Text>
-              </View>
-            ) : (
-              <>
-                {visibleAlbums.map((album, index) => (
-                  <Pressable
-                    key={album.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={album.title}
-                    onPress={() => openAlbum(album.id)}
-                    style={({ pressed }) => [
-                      styles.albumBook,
-                      getBookPosition(index),
-                      pressed ? styles.pressedBook : null,
-                    ]}
-                  >
-                    <View style={styles.bookCrop}>
-                      <Image
-                        source={albumSpineAssets[index % albumSpineAssets.length]}
-                        resizeMode="cover"
-                        style={styles.bookImage}
-                      />
-                    </View>
-                    <View style={styles.bookLabelArea} pointerEvents="none">
-                      <Text
-                        numberOfLines={1}
-                        adjustsFontSizeToFit
-                        minimumFontScale={0.62}
-                        style={styles.bookTitle}
-                      >
-                        {album.title}
-                      </Text>
-                    </View>
-                  </Pressable>
-                ))}
-
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t("library.manageAlbums")}
-                  onPress={() => router.push("/albums")}
-                  style={({ pressed }) => [
-                    styles.albumBook,
-                    getBookPosition(addBookIndex),
-                    pressed ? styles.pressedBook : null,
-                  ]}
-                >
-                  <View style={styles.bookCrop}>
-                    <Image
-                      source={albumSpineAssets[addBookIndex % albumSpineAssets.length]}
-                      resizeMode="cover"
-                      style={styles.bookImage}
-                    />
-                  </View>
-                  <View style={styles.bookLabelArea} pointerEvents="none">
-                    <Text style={styles.addBookPlus}>+</Text>
-                  </View>
-                </Pressable>
-              </>
-            )}
-          </ImageBackground>
+          <Text style={styles.eyebrow}>{t("library.eyebrow")}</Text>
+          <Text style={styles.title}>{t("library.title")}</Text>
         </View>
 
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("library.camera")}
+          onPress={() =>
+            router.push({
+              pathname: "/add-memory",
+              params: { source: "camera" },
+            })
+          }
+          style={({ pressed }) => [
+            styles.cameraObject,
+            pressed ? styles.pressedObject : null,
+          ]}
+        >
+          <Image
+            source={libraryObjectAssets.camera}
+            resizeMode="contain"
+            style={styles.objectImage}
+          />
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("library.photoFrame")}
+          onPress={() =>
+            router.push({
+              pathname: "/add-memory",
+              params: { source: "photo-library" },
+            })
+          }
+          style={({ pressed }) => [
+            styles.frameObject,
+            pressed ? styles.pressedObject : null,
+          ]}
+        >
+          <View style={styles.frameCrop}>
+            <Image
+              source={libraryObjectAssets.pictureFrames.oak}
+              resizeMode="cover"
+              style={styles.frameImage}
+            />
+          </View>
+        </Pressable>
+
+        {isLoading ? (
+          <View style={styles.statusOverlay}>
+            <ActivityIndicator color={LIGHT_WALL_TEXT} />
+          </View>
+        ) : error ? (
+          <View style={styles.statusOverlay}>
+            <Text style={styles.statusText}>{error}</Text>
+          </View>
+        ) : (
+          <>
+            {visibleAlbums.map((album, index) => (
+              <Pressable
+                key={album.id}
+                accessibilityRole="button"
+                accessibilityLabel={album.title}
+                onPress={() => openAlbum(album.id)}
+                style={({ pressed }) => [
+                  styles.albumBook,
+                  getBookPosition(index),
+                  pressed ? styles.pressedBook : null,
+                ]}
+              >
+                <View style={styles.bookCrop}>
+                  <Image
+                    source={albumSpineAssets[index % albumSpineAssets.length]}
+                    resizeMode="cover"
+                    style={styles.bookImage}
+                  />
+                </View>
+                <View style={styles.bookLabelArea} pointerEvents="none">
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.62}
+                    style={styles.bookTitle}
+                  >
+                    {album.title}
+                  </Text>
+                </View>
+              </Pressable>
+            ))}
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t("library.manageAlbums")}
+              onPress={() => router.push("/albums")}
+              style={({ pressed }) => [
+                styles.albumBook,
+                getBookPosition(addBookIndex),
+                pressed ? styles.pressedBook : null,
+              ]}
+            >
+              <View style={styles.bookCrop}>
+                <Image
+                  source={albumSpineAssets[addBookIndex % albumSpineAssets.length]}
+                  resizeMode="cover"
+                  style={styles.bookImage}
+                />
+              </View>
+              <View style={styles.bookLabelArea} pointerEvents="none">
+                <Text style={styles.addBookPlus}>+</Text>
+              </View>
+            </Pressable>
+          </>
+        )}
+
         {!isLoading && !error && albums.length === 0 ? (
-          <Text
-            style={[
-              styles.emptyHint,
-              { color: theme.colors.textMuted, width: wallDimensions.width },
-            ]}
-          > 
-            {t("library.emptyBody")}
-          </Text>
+          <Text style={styles.emptyHint}>{t("library.emptyBody")}</Text>
         ) : null}
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  content: {
+  screen: {
+    flex: 1,
+    overflow: "hidden",
+    backgroundColor: "#E9CDBF",
+  },
+  background: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  backgroundImage: {
     width: "100%",
-    alignItems: "center",
+    height: "100%",
+  },
+  wallCoordinateSpace: {
+    position: "absolute",
   },
   heading: {
-    marginBottom: 4,
-    paddingHorizontal: 8,
-    gap: 1,
+    position: "absolute",
+    left: "5%",
+    zIndex: 10,
   },
   eyebrow: {
+    color: LIGHT_WALL_MUTED_TEXT,
     fontSize: 10,
     fontWeight: "700",
     letterSpacing: 1.35,
     textTransform: "uppercase",
   },
   title: {
+    color: LIGHT_WALL_TEXT,
+    fontSize: 22,
+    lineHeight: 26,
     fontWeight: "800",
   },
-  libraryStage: {
-    alignItems: "center",
-    position: "relative",
-    marginTop: -8,
+  cameraObject: {
+    position: "absolute",
+    left: "34%",
+    top: "6.1%",
+    width: "10.5%",
+    height: "6.4%",
+    zIndex: 8,
   },
-  topObjects: {
-    width: "88%",
-    zIndex: 5,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "center",
+  frameObject: {
+    position: "absolute",
+    left: "51%",
+    top: "3.9%",
+    width: "13.5%",
+    height: "9.2%",
+    zIndex: 8,
   },
-  cameraObject: {},
-  frameObject: {},
   objectImage: {
     width: "100%",
     height: "100%",
@@ -355,19 +329,11 @@ const styles = StyleSheet.create({
     opacity: 0.76,
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
-  libraryWall: {
-    alignSelf: "center",
-    position: "relative",
-  },
-  libraryWallImage: {
-    width: "100%",
-    height: "100%",
-  },
   albumBook: {
     position: "absolute",
-    width: "15.5%",
-    height: "17.5%",
-    zIndex: 3,
+    width: "13.5%",
+    height: "13.2%",
+    zIndex: 6,
   },
   pressedBook: {
     opacity: 0.78,
@@ -415,22 +381,26 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: "12%",
     right: "12%",
-    top: "39%",
+    top: "25%",
     minHeight: 60,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12,
-    backgroundColor: "#ffffffd9",
+    backgroundColor: "#fff7efd9",
     paddingHorizontal: 14,
   },
   statusText: {
+    color: LIGHT_WALL_TEXT,
     fontSize: 13,
     fontWeight: "700",
     textAlign: "center",
   },
   emptyHint: {
-    marginTop: 4,
-    paddingHorizontal: 24,
+    position: "absolute",
+    left: "14%",
+    right: "14%",
+    top: "77%",
+    color: LIGHT_WALL_MUTED_TEXT,
     fontSize: 12,
     lineHeight: 17,
     textAlign: "center",
