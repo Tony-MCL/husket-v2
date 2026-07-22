@@ -22,13 +22,13 @@ import { useAppTheme } from "../../../theme/useAppTheme";
 import { getAlbums } from "../../albums/services/albumService";
 import {
   albumSpineAssets,
-  bookshelfAssets,
   libraryObjectAssets,
+  libraryWallAsset,
 } from "../libraryAssets";
 
 const BOOKS_PER_SHELF = 5;
-const BOOK_SHELF_TOPS = [29, 47.2, 65.5, 83.5];
-const BOOK_LEFT_POSITIONS = [10.5, 26, 41.5, 57, 72.5];
+const BOOK_SHELF_TOPS = [26.8, 46.2, 65.6, 84.4];
+const BOOK_LEFT_POSITIONS = [8.5, 25.5, 42.5, 59.5, 76.5];
 
 export function LibraryScreen() {
   const { t } = useLanguage();
@@ -155,10 +155,10 @@ export function LibraryScreen() {
           </View>
 
           <ImageBackground
-            source={bookshelfAssets.oak}
-            resizeMode="contain"
-            style={styles.bookshelf}
-            imageStyle={styles.bookshelfImage}
+            source={libraryWallAsset}
+            resizeMode="cover"
+            style={styles.libraryWall}
+            imageStyle={styles.libraryWallImage}
           >
             {isLoading ? (
               <View style={styles.statusOverlay}>
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   topObjects: {
     width: "88%",
     height: 88,
-    marginBottom: -12,
+    marginBottom: -18,
     zIndex: 5,
     flexDirection: "row",
     alignItems: "flex-end",
@@ -304,22 +304,20 @@ const styles = StyleSheet.create({
     opacity: 0.76,
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
-  bookshelf: {
-    width: "132%",
+  libraryWall: {
+    width: "100%",
     aspectRatio: 2 / 3,
     alignSelf: "center",
     position: "relative",
-    marginTop: -24,
   },
-  bookshelfImage: {
+  libraryWallImage: {
     width: "100%",
     height: "100%",
-    transform: [{ scaleX: 1.12 }],
   },
   albumBook: {
     position: "absolute",
-    width: "14.5%",
-    height: "16.5%",
+    width: "15.5%",
+    height: "17.5%",
     zIndex: 3,
   },
   pressedBook: {
@@ -350,7 +348,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   bookTitle: {
-    width: 108,
+    width: 112,
     color: "#332317",
     fontSize: 11,
     lineHeight: 13,
