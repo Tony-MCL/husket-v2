@@ -12,6 +12,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,10 +30,15 @@ import {
 const BOOKS_PER_SHELF = 5;
 const BOOK_SHELF_TOPS = [26.8, 46.2, 65.6, 84.4];
 const BOOK_LEFT_POSITIONS = [8.5, 25.5, 42.5, 59.5, 76.5];
+const WALL_ASPECT_RATIO = 2 / 3;
+const MAX_WALL_WIDTH = 620;
+const SCREEN_HORIZONTAL_PADDING = 12;
+const RESERVED_VERTICAL_SPACE = 104;
 
 export function LibraryScreen() {
   const { t } = useLanguage();
   const theme = useAppTheme();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [albums, setAlbums] = useState<Album[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +62,27 @@ export function LibraryScreen() {
     () => albums.slice(0, BOOKS_PER_SHELF * BOOK_SHELF_TOPS.length),
     [albums],
   );
+
+  const wallDimensions = useMemo(() => {
+    const widthLimitedByScreen = Math.max(
+      280,
+      screenWidth - SCREEN_HORIZONTAL_PADDING * 2,
+    );
+    const heightAvailable = Math.max(460, screenHeight - RESERVED_VERTICAL_SPACE);
+    const widthLimitedByHeight = heightAvailable * WALL_ASPECT_RATIO;
+    const wallWidth = Math.min(
+      widthLimitedByScreen,
+      widthLimitedByHeight,
+      MAX_WALL_WIDTH,
+    );
+
+    return {
+      width: wallWidth,
+      height: wallWidth / WALL_ASPECT_RATIO,
+    };
+  }, [screenHeight, screenWidth]);
+
+  const objectScale = wallDimensions.width / 420;
 
   function openAlbum(albumId: string) {
     router.push({
@@ -87,13 +114,13 @@ export function LibraryScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingHorizontal: theme.spacing.sm,
             paddingTop: theme.spacing.sm,
             paddingBottom: theme.spacing.xl,
           },
         ]}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.heading}>
+        <View style={[styles.heading, { width: wallDimensions.width }]}> 
           <Text style={[styles.eyebrow, { color: theme.colors.accent }]}> 
             {t("library.eyebrow")}
           </Text>
@@ -107,8 +134,24 @@ export function LibraryScreen() {
           </Text>
         </View>
 
-        <View style={styles.libraryStage}>
-          <View style={styles.topObjects}>
+        <View
+          style={[
+            styles.libraryStage,
+            {
+              width: wallDimensions.width,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.topObjects,
+              {
+                height: 88 * objectScale,
+                marginBottom: -18 * objectScale,
+                gap: 28 * objectScale,
+              },
+            ]}
+          >
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t("library.camera")}
@@ -120,6 +163,10 @@ export function LibraryScreen() {
               }
               style={({ pressed }) => [
                 styles.cameraObject,
+                {
+                  width: 92 * objectScale,
+                  height: 68 * objectScale,
+                },
                 pressed ? styles.pressedObject : null,
               ]}
             >
@@ -141,6 +188,10 @@ export function LibraryScreen() {
               }
               style={({ pressed }) => [
                 styles.frameObject,
+                {
+                  width: 82 * objectScale,
+                  height: 76 * objectScale,
+                },
                 pressed ? styles.pressedObject : null,
               ]}
             >
@@ -157,7 +208,13 @@ export function LibraryScreen() {
           <ImageBackground
             source={libraryWallAsset}
             resizeMode="cover"
-            style={styles.libraryWall}
+            style={[
+              styles.libraryWall,
+              {
+                width: wallDimensions.width,
+                height: wallDimensions.height,
+              },
+            ]}
             imageStyle={styles.libraryWallImage}
           >
             {isLoading ? (
@@ -231,7 +288,12 @@ export function LibraryScreen() {
         </View>
 
         {!isLoading && !error && albums.length === 0 ? (
-          <Text style={[styles.emptyHint, { color: theme.colors.textMuted }]}> 
+          <Text
+            style={[
+              styles.emptyHint,
+              { color: theme.colors.textMuted, width: wallDimensions.width },
+            ]}
+          > 
             {t("library.emptyBody")}
           </Text>
         ) : null}
@@ -244,12 +306,11 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: {
     width: "100%",
-    maxWidth: 520,
-    alignSelf: "center",
+    alignItems: "center",
   },
   heading: {
-    paddingHorizontal: 8,
     marginBottom: 4,
+    paddingHorizontal: 8,
     gap: 1,
   },
   eyebrow: {
@@ -262,29 +323,19 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   libraryStage: {
-    width: "100%",
     alignItems: "center",
     position: "relative",
     marginTop: -8,
   },
   topObjects: {
     width: "88%",
-    height: 88,
-    marginBottom: -18,
     zIndex: 5,
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "center",
-    gap: 28,
   },
-  cameraObject: {
-    width: 92,
-    height: 68,
-  },
-  frameObject: {
-    width: 82,
-    height: 76,
-  },
+  cameraObject: {},
+  frameObject: {},
   objectImage: {
     width: "100%",
     height: "100%",
@@ -305,8 +356,6 @@ const styles = StyleSheet.create({
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
   libraryWall: {
-    width: "100%",
-    aspectRatio: 2 / 3,
     alignSelf: "center",
     position: "relative",
   },
