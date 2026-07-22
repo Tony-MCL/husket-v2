@@ -265,6 +265,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     position: "relative",
+    marginTop: -8,
   },
   topObjects: {
     width: "88%",
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
   bookshelf: {
-    width: "124%",
+    width: "132%",
     aspectRatio: 2 / 3,
     alignSelf: "center",
     position: "relative",
