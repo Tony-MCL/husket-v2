@@ -38,7 +38,7 @@ export const en = {
   },
   albumDetail: {
     eyebrow: "Album",
-    back: "Back to album",
+    back: "Back to bookshelf",
     empty: "This album has no memories yet.",
     loadError: "The album could not be loaded.",
     notFound: "The album could not be found.",
