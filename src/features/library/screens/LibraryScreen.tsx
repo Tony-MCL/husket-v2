@@ -309,10 +309,12 @@ const styles = StyleSheet.create({
     aspectRatio: 2 / 3,
     alignSelf: "center",
     position: "relative",
+    marginTop: -24,
   },
   bookshelfImage: {
     width: "100%",
     height: "100%",
+    transform: [{ scaleX: 1.12 }],
   },
   albumBook: {
     position: "absolute",
