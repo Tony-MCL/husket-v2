@@ -61,7 +61,7 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
           { padding: theme.spacing.lg, gap: theme.spacing.lg },
         ]}
       >
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.replace("/")}> 
           <Text style={{ color: theme.colors.accent, fontWeight: "700" }}>
             {t("albumDetail.back")}
           </Text>
