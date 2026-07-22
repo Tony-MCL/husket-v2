@@ -40,7 +40,7 @@ export const no: TranslationDictionary = {
   },
   albumDetail: {
     eyebrow: "Album",
-    back: "Tilbake til album",
+    back: "Tilbake til bokhyllen",
     empty: "Dette albumet har ingen minner ennå.",
     loadError: "Albumet kunne ikke lastes.",
     notFound: "Albumet ble ikke funnet.",
