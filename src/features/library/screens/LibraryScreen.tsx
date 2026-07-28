@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: "27%",
     top: "12%",
-    width: "86%",
+    width: "56%",
     height: "86%",
     alignItems: "center",
     justifyContent: "center",
