@@ -23,6 +23,18 @@ export type TranslationDictionary = {
     emptyBody: string;
     manageAlbums: string;
     loadError: string;
+    albumMenuTitle: string;
+    renameAlbum: string;
+    deleteAlbum: string;
+    cancel: string;
+    renameTitle: string;
+    renamePlaceholder: string;
+    save: string;
+    renameError: string;
+    deleteTitle: string;
+    deleteBody: string;
+    deleteConfirm: string;
+    deleteError: string;
   };
   albums: {
     eyebrow: string;
