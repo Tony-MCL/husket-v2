@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   bookTitle: {
-    width: 72,
+    width: 92,
     color: "#332317",
     fontSize: 8,
     lineHeight: 9,
