@@ -26,7 +26,7 @@ import {
 } from "../libraryAssets";
 
 const BOOKS_PER_SHELF = 5;
-const ALBUM_SHELF_TOPS = [14.1, 28.4, 42.7, 57];
+const ALBUM_SHELF_TOPS = [19, 33.3, 47.6, 61.9];
 const BOOK_LEFT_POSITIONS = [8.5, 24, 39.5, 55, 70.5];
 const WALL_ASPECT_RATIO = 1024 / 1792;
 const LIGHT_WALL_TEXT = "#30251F";
@@ -211,7 +211,7 @@ export function LibraryScreen() {
                 <View style={styles.bookCrop}>
                   <Image
                     source={albumSpineAssets[index % albumSpineAssets.length]}
-                    resizeMode="cover"
+                    resizeMode="stretch"
                     style={styles.bookImage}
                   />
                 </View>
@@ -241,7 +241,7 @@ export function LibraryScreen() {
               <View style={styles.bookCrop}>
                 <Image
                   source={albumSpineAssets[addBookIndex % albumSpineAssets.length]}
-                  resizeMode="cover"
+                  resizeMode="stretch"
                   style={styles.bookImage}
                 />
               </View>
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
   albumBook: {
     position: "absolute",
-    width: "13.5%",
+    width: "11.5%",
     height: "13.2%",
     zIndex: 6,
   },
@@ -343,38 +343,37 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
-    overflow: "hidden",
   },
   bookImage: {
     position: "absolute",
-    width: "128%",
-    height: "104%",
-    left: "-14%",
-    top: "-2%",
+    width: "100%",
+    height: "100%",
+    left: 0,
+    top: 0,
   },
   bookLabelArea: {
     position: "absolute",
-    left: "19%",
-    top: "28%",
-    width: "62%",
-    height: "39%",
+    left: "17%",
+    top: "18.5%",
+    width: "66%",
+    height: "49.5%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
   bookTitle: {
-    width: 112,
+    width: 76,
     color: "#332317",
-    fontSize: 11,
-    lineHeight: 13,
+    fontSize: 10,
+    lineHeight: 12,
     fontWeight: "800",
     textAlign: "center",
     transform: [{ rotate: "-90deg" }],
   },
   addBookPlus: {
     color: "#332317",
-    fontSize: 29,
-    lineHeight: 31,
+    fontSize: 27,
+    lineHeight: 29,
     fontWeight: "500",
   },
   statusOverlay: {
