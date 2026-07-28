@@ -33,6 +33,11 @@ const LIGHT_WALL_TEXT = "#30251F";
 const LIGHT_WALL_MUTED_TEXT = "#6A574D";
 const SPINE_TITLE_MAX_CHARACTERS_PER_LINE = 18;
 const SPINE_TITLE_MAX_LINES = 2;
+const ALBUM_WIDTH_RATIO = 0.115;
+const ALBUM_HEIGHT_RATIO = 0.132;
+const SPINE_LABEL_WIDTH_RATIO = 0.5;
+const SPINE_LABEL_HEIGHT_RATIO = 0.58;
+const SPINE_LABEL_TOP_RATIO = 0.21;
 
 // ===============================
 // Album spine title formatting
@@ -136,6 +141,26 @@ export function LibraryScreen() {
       top: 0,
     };
   }, [screenHeight, screenWidth]);
+
+  const spineLabelLayout = useMemo(() => {
+    const albumWidth = wallLayout.width * ALBUM_WIDTH_RATIO;
+    const albumHeight = wallLayout.height * ALBUM_HEIGHT_RATIO;
+    const labelWidth = albumWidth * SPINE_LABEL_WIDTH_RATIO;
+    const labelHeight = albumHeight * SPINE_LABEL_HEIGHT_RATIO;
+
+    return {
+      area: {
+        left: (albumWidth - labelWidth) / 2,
+        top: albumHeight * SPINE_LABEL_TOP_RATIO,
+        width: labelWidth,
+        height: labelHeight,
+      },
+      rotatedLayer: {
+        width: labelHeight,
+        height: labelWidth,
+      },
+    };
+  }, [wallLayout.height, wallLayout.width]);
 
   function openAlbum(albumId: string) {
     router.push({
@@ -264,10 +289,20 @@ export function LibraryScreen() {
                   resizeMode="contain"
                   style={styles.bookImage}
                 />
-                <View style={styles.bookLabelArea} pointerEvents="none">
-                  <Text numberOfLines={2} style={styles.bookTitle}>
-                    {formatSpineTitle(album.title)}
-                  </Text>
+                <View
+                  pointerEvents="none"
+                  style={[styles.bookLabelArea, spineLabelLayout.area]}
+                >
+                  <View
+                    style={[
+                      styles.bookTitleRotation,
+                      spineLabelLayout.rotatedLayer,
+                    ]}
+                  >
+                    <Text numberOfLines={2} style={styles.bookTitle}>
+                      {formatSpineTitle(album.title)}
+                    </Text>
+                  </View>
                 </View>
               </Pressable>
             ))}
@@ -287,7 +322,10 @@ export function LibraryScreen() {
                 resizeMode="contain"
                 style={styles.bookImage}
               />
-              <View style={styles.bookLabelArea} pointerEvents="none">
+              <View
+                pointerEvents="none"
+                style={[styles.bookLabelArea, spineLabelLayout.area]}
+              >
                 <Text style={styles.addBookPlus}>+</Text>
               </View>
             </Pressable>
@@ -394,22 +432,22 @@ const styles = StyleSheet.create({
   },
   bookLabelArea: {
     position: "absolute",
-    left: "27%",
-    top: "12%",
-    width: "62%",
-    height: "86%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
+  bookTitleRotation: {
+    alignItems: "flex-start",
+    justifyContent: "center",
+    transform: [{ rotate: "-90deg" }],
+  },
   bookTitle: {
-    width: 99,
+    width: "100%",
     color: "#332317",
     fontSize: 8,
     lineHeight: 9,
     fontWeight: "400",
     textAlign: "left",
-    transform: [{ rotate: "-90deg" }],
   },
   addBookPlus: {
     color: "#332317",
