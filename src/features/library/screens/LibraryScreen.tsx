@@ -31,6 +31,57 @@ const BOOK_LEFT_POSITIONS = [8.5, 24, 39.5, 55, 70.5];
 const WALL_ASPECT_RATIO = 1024 / 1792;
 const LIGHT_WALL_TEXT = "#30251F";
 const LIGHT_WALL_MUTED_TEXT = "#6A574D";
+const SPINE_TITLE_MAX_CHARACTERS_PER_LINE = 12;
+const SPINE_TITLE_MAX_LINES = 2;
+
+// ===============================
+// Album spine title formatting
+// ===============================
+
+function formatSpineTitle(title: string): string {
+  const normalizedTitle = title.trim().replace(/\s+/g, " ");
+
+  if (normalizedTitle.length <= SPINE_TITLE_MAX_CHARACTERS_PER_LINE) {
+    return normalizedTitle;
+  }
+
+  const lines: string[] = [];
+  let remainingTitle = normalizedTitle;
+
+  while (remainingTitle.length > 0 && lines.length < SPINE_TITLE_MAX_LINES) {
+    if (remainingTitle.length <= SPINE_TITLE_MAX_CHARACTERS_PER_LINE) {
+      lines.push(remainingTitle);
+      remainingTitle = "";
+      break;
+    }
+
+    const candidateLine = remainingTitle.slice(
+      0,
+      SPINE_TITLE_MAX_CHARACTERS_PER_LINE + 1,
+    );
+    const lastSpaceIndex = candidateLine.lastIndexOf(" ");
+    const splitIndex = lastSpaceIndex > 0
+      ? lastSpaceIndex
+      : SPINE_TITLE_MAX_CHARACTERS_PER_LINE;
+
+    lines.push(remainingTitle.slice(0, splitIndex).trim());
+    remainingTitle = remainingTitle.slice(splitIndex).trim();
+  }
+
+  if (remainingTitle.length > 0 && lines.length > 0) {
+    const finalLine = lines[lines.length - 1];
+    lines[lines.length - 1] = `${finalLine.slice(
+      0,
+      SPINE_TITLE_MAX_CHARACTERS_PER_LINE - 1,
+    )}…`;
+  }
+
+  return lines.join("\n");
+}
+
+// ===============================
+// Library screen
+// ===============================
 
 export function LibraryScreen() {
   const { t } = useLanguage();
@@ -214,13 +265,8 @@ export function LibraryScreen() {
                   style={styles.bookImage}
                 />
                 <View style={styles.bookLabelArea} pointerEvents="none">
-                  <Text
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.62}
-                    style={styles.bookTitle}
-                  >
-                    {album.title}
+                  <Text numberOfLines={2} style={styles.bookTitle}>
+                    {formatSpineTitle(album.title)}
                   </Text>
                 </View>
               </Pressable>
@@ -255,6 +301,10 @@ export function LibraryScreen() {
     </View>
   );
 }
+
+// ===============================
+// Styles
+// ===============================
 
 const styles = StyleSheet.create({
   screen: {
@@ -353,12 +403,12 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   bookTitle: {
-    width: 76,
+    width: 58,
     color: "#332317",
-    fontSize: 10,
-    lineHeight: 12,
+    fontSize: 8,
+    lineHeight: 9,
     fontWeight: "400",
-    textAlign: "center",
+    textAlign: "left",
     transform: [{ rotate: "-90deg" }],
   },
   addBookPlus: {
