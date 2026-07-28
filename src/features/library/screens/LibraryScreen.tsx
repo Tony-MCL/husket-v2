@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     left: "27%",
     top: "18%",
     width: "46%",
-    height: "76%",
+    height: "86%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
