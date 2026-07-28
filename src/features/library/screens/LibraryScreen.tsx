@@ -208,13 +208,11 @@ export function LibraryScreen() {
                   pressed ? styles.pressedBook : null,
                 ]}
               >
-                <View style={styles.bookCrop}>
-                  <Image
-                    source={albumSpineAssets[index % albumSpineAssets.length]}
-                    resizeMode="stretch"
-                    style={styles.bookImage}
-                  />
-                </View>
+                <Image
+                  source={albumSpineAssets[index % albumSpineAssets.length]}
+                  resizeMode="contain"
+                  style={styles.bookImage}
+                />
                 <View style={styles.bookLabelArea} pointerEvents="none">
                   <Text
                     numberOfLines={1}
@@ -238,13 +236,11 @@ export function LibraryScreen() {
                 pressed ? styles.pressedBook : null,
               ]}
             >
-              <View style={styles.bookCrop}>
-                <Image
-                  source={albumSpineAssets[addBookIndex % albumSpineAssets.length]}
-                  resizeMode="stretch"
-                  style={styles.bookImage}
-                />
-              </View>
+              <Image
+                source={albumSpineAssets[addBookIndex % albumSpineAssets.length]}
+                resizeMode="contain"
+                style={styles.bookImage}
+              />
               <View style={styles.bookLabelArea} pointerEvents="none">
                 <Text style={styles.addBookPlus}>+</Text>
               </View>
@@ -333,30 +329,25 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "11.5%",
     height: "13.2%",
+    alignItems: "center",
+    justifyContent: "center",
     zIndex: 6,
   },
   pressedBook: {
     opacity: 0.78,
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
-  bookCrop: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
   bookImage: {
     position: "absolute",
     width: "100%",
     height: "100%",
-    left: 0,
-    top: 0,
   },
   bookLabelArea: {
     position: "absolute",
-    left: "17%",
-    top: "18.5%",
-    width: "66%",
-    height: "49.5%",
+    left: "34%",
+    top: "21%",
+    width: "32%",
+    height: "47%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
@@ -372,8 +363,8 @@ const styles = StyleSheet.create({
   },
   addBookPlus: {
     color: "#332317",
-    fontSize: 27,
-    lineHeight: 29,
+    fontSize: 24,
+    lineHeight: 26,
     fontWeight: "500",
   },
   statusOverlay: {
