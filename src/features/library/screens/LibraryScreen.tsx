@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     color: "#332317",
     fontSize: 10,
     lineHeight: 12,
-    fontWeight: "800",
+    fontWeight: "400",
     textAlign: "center",
     transform: [{ rotate: "-90deg" }],
   },
