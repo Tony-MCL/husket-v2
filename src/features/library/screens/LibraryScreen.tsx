@@ -443,6 +443,7 @@ const styles = StyleSheet.create({
   },
   bookTitle: {
     width: "100%",
+    paddingLeft: 8,
     color: "#332317",
     fontSize: 8,
     lineHeight: 9,
