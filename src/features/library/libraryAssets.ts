@@ -28,14 +28,7 @@ export const libraryObjectAssets = {
 } satisfies Record<string, unknown>;
 
 export const albumSpineAssets: ImageSourcePropType[] = [
-  require("../../../assets/spine-leather-brown.png"),
-  require("../../../assets/spine-leather-green.png"),
-  require("../../../assets/spine-leather-blue.png"),
-  require("../../../assets/spine-leather-burgundy.png"),
-  require("../../../assets/spine-leather-caramel.png"),
-  require("../../../assets/spine-linen-beige.png"),
-  require("../../../assets/spine-linen-ivory.png"),
-  require("../../../assets/spine-linen-pink.png"),
+  require("../../../assets/new_album.png"),
 ];
 
 export type BookshelfThemeId = keyof typeof bookshelfAssets;
