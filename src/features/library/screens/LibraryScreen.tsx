@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   bookLabelArea: {
     position: "absolute",
     left: "27%",
-    top: "18%",
+    top: "12%",
     width: "46%",
     height: "86%",
     alignItems: "center",
