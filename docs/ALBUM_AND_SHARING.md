@@ -43,9 +43,28 @@ Albumtekst tilhører albumet som helhet og følger ikke automatisk med når et e
 
 ---
 
-## Oppslag og sidemaler
+## Oppslag, sider og sidemaler
 
 Et album presenteres som oppslag med tydelige venstre- og høyresider. Oppslagene skal gi følelsen av et fysisk fotoalbum, men bruke digitale fordeler som stabil navigasjon, fleksibel layout og enkel redigering.
+
+Grunnmodellen er:
+
+> Én albumside er ett minne og ett husk'et.
+
+En side kan i første versjon inneholde:
+
+- ett bilde
+- to bilder
+- tre bilder
+
+Senere kan samme minne utvides med flere bilder uten at grunnmodellen endres.
+
+Alle bildene på siden tilhører samme minne og deler derfor ett felles sett med metadata:
+
+- én kommentar
+- én følelsesemoji
+- én dato
+- ett sted
 
 Første versjon skal bruke et begrenset sett med faste sidemaler. Aktuelle grunnmaler er:
 
@@ -53,16 +72,13 @@ Første versjon skal bruke et begrenset sett med faste sidemaler. Aktuelle grunn
 - to bilder
 - ett stort bilde kombinert med to mindre bilder
 
-Brukeren velger selv hvilken sidemal den enkelte siden skal bruke.
+Antallet bilder bestemmer hvilken grunnmal som brukes i første versjon. Senere kan brukeren få flere alternative komposisjoner for samme antall bilder.
 
-Når en sidemal er valgt:
+Rekkefølgen i minnets medieliste bestemmer presentasjonen:
 
-- lagres valget som en del av siden
-- brukes samme layout hver gang siden åpnes
-- kan brukeren endre sidemalen senere
-- skal bilder og metadata ikke gå tapt når malen endres
-
-Hvis en ny sidemal har færre bildefelt enn siden allerede inneholder, skal overskytende minner aldri slettes. De skal flyttes videre på en trygg og forståelig måte, eller plasseres i en tydelig liste over minner som ennå ikke er plassert på en side.
+- første bilde er hovedbildet
+- øvrige bilder følger i lagret rekkefølge
+- brukeren skal senere kunne endre rekkefølge og hovedbilde uten å endre originalfilene
 
 Fri dra-og-slipp-plassering er ikke et krav i første versjon. Faste og gjennomarbeidede sidemaler prioriteres for å sikre stabilitet, enkelhet og et helhetlig visuelt uttrykk.
 
@@ -70,25 +86,33 @@ Fri dra-og-slipp-plassering er ikke et krav i første versjon. Faste og gjennoma
 
 ## Minnet
 
-Et minne er en arkivert del av et album.
+Et minne er en arkivert og sammenhengende opplevelse i et album.
 
-I første versjon består et minne normalt av:
+Grunnregelen er:
 
-- ett bilde
+> Ett husk'et er ett minne. Ett minne kan inneholde ett eller flere bilder.
+
+I første versjon kan et minne bestå av:
+
+- ett, to eller tre bilder
 - en kort, valgfri kommentar
 - en valgfri emoji som uttrykker følelsen eller stemningen i øyeblikket
 - opprinnelig dato når denne er kjent
 - sted når dette er tilgjengelig og brukeren tillater det
 
-Kommentaren er en del av minnet på lik linje med bildet. Den skal følge minnet når det deles eller legges til i et annet album.
+Alle bilder i samme minne deler kommentaren og metadataene. Bildene skal sammen beskrive ett øyeblikk, en liten hendelse eller en sammenhengende historie.
 
-Albumet kan inneholde mange minner fra samme hendelse eller periode. Hvert bilde kan derfor ha sin egen kommentar og følelse, selv om albumet også har en overordnet tekst.
+Antallet bilder endrer hvordan minnet presenteres, men ikke hva som regnes som ett minne eller ett husk'et.
+
+Kommentaren er en del av minnet på lik linje med bildene. Hele minnet skal følge samlet når det deles eller legges til i et annet album.
+
+Et album kan inneholde mange minner fra samme hendelse eller periode. Hvert minne kan ha sin egen kommentar og følelse, selv om albumet også har en overordnet tekst.
 
 ---
 
-## Presentasjon av bilde og metadata
+## Presentasjon av bilder og metadata
 
-Hvert bildefelt i en sidemal skal ha designerte områder for bilde og tilhørende metadata.
+Hver albumside skal ha designerte områder for minnets bilder og ett felles metadatafelt.
 
 Metadata kan omfatte:
 
@@ -97,7 +121,7 @@ Metadata kan omfatte:
 - følelsesemoji
 - GPS- eller stedsindikator
 
-Metadata skal presenteres rolig og diskret, og skal aldri brennes inn i originalbildet.
+Metadata skal presenteres rolig og diskret, og skal aldri brennes inn i originalbildene.
 
 Følgende regler gjelder:
 
@@ -106,6 +130,7 @@ Følgende regler gjelder:
 - kommentarfelt skjules eller kollapser når kommentaren er tom
 - dato vises som standard når den er kjent
 - tomme metadatafelt skal ikke etterlate unødvendig visuell plass
+- metadata gjelder hele minnet og skal ikke gjentas separat under hvert bilde
 
 Et GPS-ikon kan senere åpne kart eller stedsinformasjon, men selve albumvisningen skal være rolig og ikke fylles med tekniske detaljer.
 
@@ -113,18 +138,28 @@ Et GPS-ikon kan senere åpne kart eller stedsinformasjon, men selve albumvisning
 
 ## Visning, redigering og handlinger
 
-Trykk på selve bildet skal åpne bildet i fullskjerm.
+Trykk på et bilde skal åpne bildet i fullskjerm.
 
-Redigering skal ikke lenger være skjult bak trykk på bildet. Siden skal ha et eget, tydelig ikon eller en egen knapp for redigering av minnet og dets metadata.
+Redigering skal ikke være skjult bak trykk på bildet. Siden skal ha et eget, tydelig ikon eller en egen knapp for redigering av hele minnet og dets metadata.
 
 Grunnregelen er:
 
-- trykk på bildet åpner fullskjermvisning
-- redigeringsikon åpner redigering av minnet
-- layoutikon åpner valg eller endring av sidemal
+- trykk på et bilde åpner dette bildet i fullskjermvisning
+- redigeringsikon åpner redigering av hele minnet
 - eksportikon åpner eksportvalg
 
-Fullskjermvisningen skal vise bildet uten påbrent kommentar, dato, emoji eller GPS-ikon.
+Redigering av et minne skal senere kunne støtte:
+
+- legge til bilde
+- fjerne bilde fra minnet
+- endre bilderekkefølge
+- velge hovedbilde
+- redigere felles kommentar
+- redigere felles emoji
+- redigere felles dato og sted
+- flytte hele minnet til et annet album
+
+Fullskjermvisningen skal vise valgt bilde uten påbrent kommentar, dato, emoji eller GPS-ikon.
 
 ---
 
@@ -164,7 +199,11 @@ Importflyten skal følge denne rekkefølgen:
 3. hver kopi kontrolleres før importen regnes som vellykket
 4. stabile filreferanser lagres
 5. forhåndsvisninger og miniatyrbilder genereres separat
-6. minnet opprettes først når originalfilen er trygt lagret
+6. minnet opprettes først når originalfilene er trygt lagret
+
+Når flere bilder velges til samme minne, opprettes ett samlet husk'et med ett felles metadatafelt.
+
+Senere kan importflyten også tilby et eksplisitt valg om å opprette ett separat husk'et per valgt bilde.
 
 Ved masseimport skal appen kunne vise status per fil og en tydelig oppsummering av vellykkede og mislykkede importer.
 
@@ -217,7 +256,7 @@ husk'et skal ikke love at tredjepartskameraet alltid gir identisk behandling som
 
 ## Eksport
 
-Brukeren skal alltid kunne eksportere originalbildet uten husk'et-metadata eller visuell albumbehandling.
+Brukeren skal alltid kunne eksportere hvert originalbilde uten husk'et-metadata eller visuell albumbehandling.
 
 Eksport av original skal:
 
@@ -228,6 +267,8 @@ Eksport av original skal:
 - ikke brenne inn kommentar, dato, emoji eller GPS-ikon
 - beholde original filtype når plattformen og filtilgangen gjør dette mulig
 
+Når et minne inneholder flere bilder, skal brukeren kunne eksportere ett valgt originalbilde eller alle originalbildene i minnet.
+
 Dette skal gjøre det mulig å bruke bilder fra husk'et til blant annet:
 
 - fysisk fotobok
@@ -236,9 +277,9 @@ Dette skal gjøre det mulig å bruke bilder fra husk'et til blant annet:
 - sikkerhetskopi
 - deling uten husk'et-design
 
-Senere kan eksportvalget også tilby en egen ferdig husk'et-presentasjon med bilde og metadata. Denne presentasjonen skal være et tillegg og aldri erstatte eksport av originalfilen.
+Senere kan eksportvalget også tilby en egen ferdig husk'et-presentasjon med alle bildene og felles metadata. Denne presentasjonen skal være et tillegg og aldri erstatte eksport av originalfilene.
 
-Eksport av originalbildet skal ikke ligge bak abonnement eller andre begrensninger.
+Eksport av originalbildene skal ikke ligge bak abonnement eller andre begrensninger.
 
 ---
 
@@ -263,9 +304,9 @@ husk'et v2 skal støtte to tydelig adskilte tekstnivåer:
 
 ### Tekst på minnenivå
 
-- kort kommentar knyttet til det enkelte bildet
-- beskriver øyeblikket, situasjonen eller følelsen
-- følger minnet ved deling
+- én kort kommentar knyttet til hele minnet
+- beskriver øyeblikket, situasjonen eller følelsen som bildene deler
+- følger hele minnet ved deling
 
 ### Tekst på albumnivå
 
@@ -306,37 +347,37 @@ Kort skal ikke være hovedvisningen i albumet og skal ikke brukes som albumets p
 
 Et husk'et-kort brukes kun som presentasjon når et minne deles.
 
-Delingskortet kan inneholde:
+Delingskortet skal kunne presentere:
 
-- valgt kortbakgrunn
-- bilde
-- kort kommentar
-- følelsesemoji
+- ett eller flere bilder fra samme minne
+- én kort kommentar
+- én følelsesemoji
 - diskret dato og sted
 - avsender
+- valgt kortbakgrunn og visuell layout
 
 Kortbakgrunn, layout og andre visuelle valg tilhører delingspresentasjonen. De skal ikke endre selve minnet i albumet.
 
-Det skal ikke være noe visuelt eller funksjonelt skille mellom et minne som deles rett etter at bildet er tatt og et eldre minne som deles fra et album.
+Det skal ikke være noe visuelt eller funksjonelt skille mellom et minne som deles rett etter at det er opprettet og et eldre minne som deles fra et album.
 
 ---
 
 ## Mottak, reaksjon og arkivering
 
-Når mottakeren åpner et delt husk'et, vises minnet som et kort.
+Når mottakeren åpner et delt husk'et, vises hele minnet som ett kort eller én samlet presentasjon.
 
 Mottakeren skal kunne:
 
-- se minnet
-- reagere med en emoji
-- velge å legge minnet til i sitt eget album
+- se alle bildene i minnet
+- reagere med en emoji på hele husk'et
+- velge å legge hele minnet til i sitt eget album
 - la minnet bli liggende uten å arkivere det
 
 En emoji-reaksjon skal ikke starte en chat. Senderen får kun et enkelt varsel, for eksempel «Nellie likte din husk'et».
 
-Når mottakeren velger å legge minnet til i sitt album, arkiveres selve minnet:
+Når mottakeren velger å legge minnet til i sitt album, arkiveres hele minnet:
 
-- bildet
+- alle bildene
 - kommentaren
 - følelsesemojien
 - dato og sted
@@ -351,19 +392,26 @@ Delingskortets bakgrunn og layout skal normalt ikke lagres som en del av albummi
 Den tekniske modellen skal skille mellom:
 
 - `Album` – permanent organisering og albumopplevelse
-- `AlbumPage` – valgt sidemal, rekkefølge og plassering av minner
-- `Memory` – bilde og tilhørende personlig kontekst
-- `MediaAsset` – originalfil, forhåndsvisning, miniatyr og filstatus
+- `Memory` – én albumside, ett husk'et, ett eller flere bilder og ett felles sett personlig kontekst
+- `MediaAsset` – én originalfil med forhåndsvisning, miniatyr og filstatus
 - `SharePresentation` – valgt kortdesign og layout
 - `SharedMemory` – den konkrete delingshendelsen
 
-Visuell beskjæring, zoom og rotasjon tilhører albumplasseringen eller visningslaget og skal ikke endre `MediaAsset` sin originalfil.
+Det skal ikke innføres en separat `AlbumPage`-modell i første versjon. Siden er presentasjonen av `Memory`, og antallet medier i minnet bestemmer grunnlayouten.
 
-Dette gjør at nye sidemaler, kortdesign og delingsfunksjoner kan utvikles uten å påvirke originalbildet eller den grunnleggende minnemodellen.
+Visuell beskjæring, zoom og rotasjon tilhører visningslaget og skal ikke endre `MediaAsset` sin originalfil.
+
+Dette gjør at nye bildeoppsett, kortdesign og delingsfunksjoner kan utvikles uten å påvirke originalbildene eller den grunnleggende minnemodellen.
 
 ---
 
 ## Grunnregler
+
+> Ett husk'et er ett minne. Ett minne kan inneholde ett eller flere bilder.
+
+> Én albumside er ett minne og har ett felles sett metadata.
+
+> Antallet bilder endrer presentasjonen, men ikke hva som regnes som ett minne.
 
 > Albumet bevarer minnet. Kortet presenterer minnet når det deles.
 
