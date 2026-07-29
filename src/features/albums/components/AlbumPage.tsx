@@ -25,25 +25,39 @@ const moodEmoji: Record<MemoryMood, string> = {
 type AlbumPageProps = {
   memory: Memory;
   onPress: () => void;
+  onOpenPhoto: (photoIndex: number) => void;
 };
 
 // ===============================
 // Photo layout selection
 // ===============================
 
-function renderPhotoLayout(memory: Memory) {
+function renderPhotoLayout(
+  memory: Memory,
+  onOpenPhoto: (photoIndex: number) => void,
+) {
   const [firstMedia, secondMedia, thirdMedia] = memory.media;
 
   if (firstMedia && secondMedia && thirdMedia) {
-    return <ThreePhotoLayout media={[firstMedia, secondMedia, thirdMedia]} />;
+    return (
+      <ThreePhotoLayout
+        media={[firstMedia, secondMedia, thirdMedia]}
+        onOpenPhoto={onOpenPhoto}
+      />
+    );
   }
 
   if (firstMedia && secondMedia) {
-    return <TwoPhotoLayout media={[firstMedia, secondMedia]} />;
+    return (
+      <TwoPhotoLayout
+        media={[firstMedia, secondMedia]}
+        onOpenPhoto={onOpenPhoto}
+      />
+    );
   }
 
   if (firstMedia) {
-    return <SinglePhotoLayout media={firstMedia} />;
+    return <SinglePhotoLayout media={firstMedia} onOpenPhoto={onOpenPhoto} />;
   }
 
   return null;
@@ -54,7 +68,7 @@ function renderPhotoLayout(memory: Memory) {
 // ===============================
 
 /** Viser ett minne som én albumside med mellom ett og tre bilder. */
-export function AlbumPage({ memory, onPress }: AlbumPageProps) {
+export function AlbumPage({ memory, onPress, onOpenPhoto }: AlbumPageProps) {
   const theme = useAppTheme();
 
   return (
@@ -73,7 +87,7 @@ export function AlbumPage({ memory, onPress }: AlbumPageProps) {
         },
       ]}
     >
-      {renderPhotoLayout(memory)}
+      {renderPhotoLayout(memory, onOpenPhoto)}
 
       {memory.mood ? (
         <Text style={styles.mood} accessibilityLabel={memory.mood}>
