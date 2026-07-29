@@ -4,7 +4,7 @@
     "slug": "husket-v2",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/husket-icon.png",
     "scheme": "husket-v2",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -13,14 +13,12 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#EDE4D4",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/husket-icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/husket-icon.png"
     },
     "plugins": [
       "expo-router",
