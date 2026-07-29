@@ -9,7 +9,7 @@ import { libraryObjectAssets } from "../libraryAssets";
 
 const WALL_ASPECT_RATIO = 1024 / 1792;
 const MAIL_LEFT = 13.5;
-const MAIL_TOP = 16.2;
+const MAIL_TOP = 16.5;
 const MAIL_WIDTH = 12.5;
 const MAIL_HEIGHT = 7.2;
 
