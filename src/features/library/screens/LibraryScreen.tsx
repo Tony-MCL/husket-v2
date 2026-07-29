@@ -32,7 +32,7 @@ import {
   libraryWallAsset,
 } from "../libraryAssets";
 
-const BOOKS_PER_SHELF = 10;
+const BOOKS_PER_SHELF = 11;
 const SHELF_COUNT = 4;
 const WALL_ASPECT_RATIO = 1024 / 1792;
 const LIGHT_WALL_TEXT = "#30251F";
