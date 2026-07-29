@@ -4,6 +4,7 @@
 
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useLanguage } from "../../../i18n/LanguageProvider";
 import type { Memory, MemoryMood } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import {
@@ -64,12 +65,41 @@ function renderPhotoLayout(
 }
 
 // ===============================
+// Metadata formatting
+// ===============================
+
+function formatMemoryDate(memory: Memory, language: "no" | "en"): string {
+  const dateValue = memory.capturedAt ?? memory.createdAt;
+  const parsedDate = new Date(dateValue);
+
+  if (Number.isNaN(parsedDate.getTime())) return "";
+
+  return new Intl.DateTimeFormat(language === "no" ? "nb-NO" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(parsedDate);
+}
+
+function formatMemoryLocation(memory: Memory): string | null {
+  if (!memory.location) return null;
+  if (memory.location.placeName?.trim()) return memory.location.placeName.trim();
+
+  return `${memory.location.latitude.toFixed(4)}, ${memory.location.longitude.toFixed(4)}`;
+}
+
+// ===============================
 // Album page
 // ===============================
 
 /** Viser ett minne som én albumside med mellom ett og tre bilder. */
 export function AlbumPage({ memory, onPress, onOpenPhoto }: AlbumPageProps) {
+  const { language } = useLanguage();
   const theme = useAppTheme();
+  const formattedDate = formatMemoryDate(memory, language);
+  const formattedLocation = formatMemoryLocation(memory);
+  const editLabel = language === "no" ? "Rediger minnet" : "Edit memory";
+  const openLabel = language === "no" ? "Åpne minnet" : "Open memory";
 
   return (
     <View
@@ -88,7 +118,7 @@ export function AlbumPage({ memory, onPress, onOpenPhoto }: AlbumPageProps) {
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Open memory details"
+        accessibilityLabel={editLabel}
         onPress={onPress}
         style={({ pressed }) => [
           styles.detailsButton,
@@ -103,6 +133,25 @@ export function AlbumPage({ memory, onPress, onOpenPhoto }: AlbumPageProps) {
       >
         <View style={styles.detailsContent}>
           <View style={styles.memoryText}>
+            <View style={styles.metadataRow}>
+              {formattedDate ? (
+                <Text
+                  style={[styles.metadataText, { color: theme.colors.textMuted }]}
+                >
+                  {formattedDate}
+                </Text>
+              ) : null}
+
+              {formattedLocation ? (
+                <Text
+                  numberOfLines={1}
+                  style={[styles.metadataText, { color: theme.colors.textMuted }]}
+                >
+                  📍 {formattedLocation}
+                </Text>
+              ) : null}
+            </View>
+
             {memory.mood ? (
               <Text style={styles.mood} accessibilityLabel={memory.mood}>
                 {moodEmoji[memory.mood]}
@@ -121,25 +170,30 @@ export function AlbumPage({ memory, onPress, onOpenPhoto }: AlbumPageProps) {
               >
                 {memory.comment}
               </Text>
-            ) : (
+            ) : !formattedDate && !formattedLocation && !memory.mood ? (
               <Text
                 style={[
                   styles.emptyDetails,
                   { color: theme.colors.textMuted },
                 ]}
               >
-                Åpne minnet
+                {openLabel}
               </Text>
-            )}
+            ) : null}
           </View>
 
-          <Text
-            accessibilityElementsHidden
-            importantForAccessibility="no"
-            style={[styles.editIndicator, { color: theme.colors.textMuted }]}
-          >
-            ›
-          </Text>
+          <View style={styles.editAction}>
+            <Text style={[styles.editLabel, { color: theme.colors.accent }]}> 
+              {editLabel}
+            </Text>
+            <Text
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+              style={[styles.editIndicator, { color: theme.colors.accent }]}
+            >
+              ›
+            </Text>
+          </View>
         </View>
       </Pressable>
     </View>
@@ -167,6 +221,15 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 8,
   },
+  metadataRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  metadataText: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
   mood: {
     fontSize: 28,
   },
@@ -175,6 +238,15 @@ const styles = StyleSheet.create({
   },
   emptyDetails: {
     fontSize: 14,
+    fontWeight: "700",
+  },
+  editAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexShrink: 0,
+  },
+  editLabel: {
+    fontSize: 13,
     fontWeight: "700",
   },
   editIndicator: {
