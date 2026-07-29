@@ -20,6 +20,7 @@ import type { Album, Memory } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { getMemoriesByAlbumId } from "../../memories/services/memoryService";
 import { AlbumSpread } from "../components/AlbumSpread";
+import { MemoryFullscreenViewer } from "../components/MemoryFullscreenViewer";
 import { getAlbumById } from "../services/albumService";
 
 const COMPACT_ALBUM_BREAKPOINT = 720;
@@ -39,6 +40,8 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
   const [album, setAlbum] = useState<Album | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [currentSpreadIndex, setCurrentSpreadIndex] = useState(0);
+  const [viewerMemory, setViewerMemory] = useState<Memory | null>(null);
+  const [viewerPhotoIndex, setViewerPhotoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,6 +87,16 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
 
   function openMemory(memoryId: string) {
     router.push(`/memories/${memoryId}`);
+  }
+
+  function openPhoto(memory: Memory, photoIndex: number) {
+    setViewerPhotoIndex(photoIndex);
+    setViewerMemory(memory);
+  }
+
+  function closePhotoViewer() {
+    setViewerMemory(null);
+    setViewerPhotoIndex(0);
   }
 
   function showPreviousSpread() {
@@ -175,6 +188,7 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
                   rightMemory={currentSpreadMemories.rightMemory}
                   isCompact={isCompact}
                   onOpenMemory={openMemory}
+                  onOpenPhoto={openPhoto}
                 />
 
                 <View style={styles.navigationRow}>
@@ -250,6 +264,12 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
           </>
         ) : null}
       </ScrollView>
+
+      <MemoryFullscreenViewer
+        memory={viewerMemory}
+        initialPhotoIndex={viewerPhotoIndex}
+        onClose={closePhotoViewer}
+      />
     </SafeAreaView>
   );
 }
