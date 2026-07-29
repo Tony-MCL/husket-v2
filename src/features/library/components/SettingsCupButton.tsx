@@ -16,7 +16,7 @@ import { libraryObjectAssets } from "../libraryAssets";
 
 const WALL_ASPECT_RATIO = 1024 / 1792;
 const CUP_LEFT = 69;
-const CUP_TOP = 14.7;
+const CUP_TOP = 14.1;
 const CUP_WIDTH = 12.5;
 const CUP_HEIGHT = 7.8;
 
