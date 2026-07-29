@@ -13,9 +13,9 @@ import { memoryRepository } from "../../../storage";
 
 export type CreateMemoryInput = {
   albumId: string;
-  /** Eksisterende ettbilde-flyt. Beholdes til opprettelsesskjermen er bygget om. */
+  /** Eksisterende ettbilde-flyt. Beholdes for bakoverkompatibilitet. */
   importedMemory?: ImportedMemory;
-  /** Ny flerbilde-flyt. Ett minne kan inneholde mellom ett og tre bilder. */
+  /** Ett minne kan inneholde mellom ett og tre bilder. */
   importedMemories?: ImportedMemory[];
   comment?: string;
   mood?: MemoryMood;
@@ -25,6 +25,7 @@ export type UpdateMemoryInput = {
   albumId: string;
   comment?: string;
   mood?: MemoryMood;
+  media?: MemoryMedia[];
 };
 
 function createId(prefix: string): string {
@@ -33,6 +34,16 @@ function createId(prefix: string): string {
   }
 
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function validateMediaCount(mediaCount: number): void {
+  if (mediaCount === 0) {
+    throw new Error("MEDIA_REQUIRED");
+  }
+
+  if (mediaCount > MAX_MEMORY_MEDIA_ITEMS) {
+    throw new Error("TOO_MANY_MEDIA_ITEMS");
+  }
 }
 
 function resolveImportedMemories(input: CreateMemoryInput): ImportedMemory[] {
@@ -49,14 +60,7 @@ function resolveImportedMemories(input: CreateMemoryInput): ImportedMemory[] {
       ? [input.importedMemory]
       : [];
 
-  if (importedMemories.length === 0) {
-    throw new Error("MEDIA_REQUIRED");
-  }
-
-  if (importedMemories.length > MAX_MEMORY_MEDIA_ITEMS) {
-    throw new Error("TOO_MANY_MEDIA_ITEMS");
-  }
-
+  validateMediaCount(importedMemories.length);
   return importedMemories;
 }
 
@@ -109,7 +113,7 @@ export async function getMemoryById(memoryId: string): Promise<Memory | null> {
   return memoryRepository.getById(memoryId);
 }
 
-/** Oppdaterer kommentar, følelse eller album for et eksisterende minne. */
+/** Oppdaterer innhold, følelse, album eller bilderekkefølge for et minne. */
 export async function updateMemory(
   memoryId: string,
   input: UpdateMemoryInput,
@@ -124,10 +128,14 @@ export async function updateMemory(
     throw new Error("ALBUM_REQUIRED");
   }
 
+  const media = input.media ? [...input.media] : existingMemory.media;
+  validateMediaCount(media.length);
+
   const comment = input.comment?.trim();
   const updatedMemory: Memory = {
     ...existingMemory,
     albumId: input.albumId,
+    media,
     comment: comment || undefined,
     mood: input.mood,
     updatedAt: new Date().toISOString(),
