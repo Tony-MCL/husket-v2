@@ -2,6 +2,7 @@
 // src/features/albums/components/MemoryFullscreenViewer.tsx
 // ===============================
 
+import { useEffect, useState } from "react";
 import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -28,23 +29,24 @@ export function MemoryFullscreenViewer({
   onClose,
 }: MemoryFullscreenViewerProps) {
   const insets = useSafeAreaInsets();
+  const [activePhotoIndex, setActivePhotoIndex] = useState(initialPhotoIndex);
   const media = memory?.media ?? [];
-  const safeInitialIndex = Math.min(
-    Math.max(initialPhotoIndex, 0),
+
+  useEffect(() => {
+    setActivePhotoIndex(initialPhotoIndex);
+  }, [initialPhotoIndex, memory?.id]);
+
+  const safeActiveIndex = Math.min(
+    Math.max(activePhotoIndex, 0),
     Math.max(media.length - 1, 0),
   );
-
-  const activeMedia = media[safeInitialIndex];
-  const hasPrevious = safeInitialIndex > 0;
-  const hasNext = safeInitialIndex < media.length - 1;
+  const activeMedia = media[safeActiveIndex];
+  const hasPrevious = safeActiveIndex > 0;
+  const hasNext = safeActiveIndex < media.length - 1;
 
   function openPhoto(photoIndex: number) {
-    if (!memory || photoIndex < 0 || photoIndex >= media.length) return;
-
-    onClose();
-    requestAnimationFrame(() => {
-      MemoryFullscreenViewerState.open(memory, photoIndex, onClose);
-    });
+    if (photoIndex < 0 || photoIndex >= media.length) return;
+    setActivePhotoIndex(photoIndex);
   }
 
   return (
@@ -66,7 +68,7 @@ export function MemoryFullscreenViewer({
       >
         <View style={styles.topBar}>
           <Text style={styles.counter}>
-            {media.length > 0 ? `${safeInitialIndex + 1} / ${media.length}` : ""}
+            {media.length > 0 ? `${safeActiveIndex + 1} / ${media.length}` : ""}
           </Text>
 
           <Pressable
@@ -97,7 +99,7 @@ export function MemoryFullscreenViewer({
             accessibilityRole="button"
             accessibilityLabel="Previous photo"
             disabled={!hasPrevious}
-            onPress={() => openPhoto(safeInitialIndex - 1)}
+            onPress={() => openPhoto(safeActiveIndex - 1)}
             style={({ pressed }) => [
               styles.navigationButton,
               !hasPrevious ? styles.disabled : null,
@@ -116,7 +118,7 @@ export function MemoryFullscreenViewer({
                 onPress={() => openPhoto(index)}
                 style={[
                   styles.dot,
-                  index === safeInitialIndex ? styles.activeDot : null,
+                  index === safeActiveIndex ? styles.activeDot : null,
                 ]}
               />
             ))}
@@ -126,7 +128,7 @@ export function MemoryFullscreenViewer({
             accessibilityRole="button"
             accessibilityLabel="Next photo"
             disabled={!hasNext}
-            onPress={() => openPhoto(safeInitialIndex + 1)}
+            onPress={() => openPhoto(safeActiveIndex + 1)}
             style={({ pressed }) => [
               styles.navigationButton,
               !hasNext ? styles.disabled : null,
@@ -140,16 +142,6 @@ export function MemoryFullscreenViewer({
     </Modal>
   );
 }
-
-// ===============================
-// Internal state bridge
-// ===============================
-
-const MemoryFullscreenViewerState = {
-  open(_memory: Memory, _photoIndex: number, _onClose: () => void) {
-    // State ownership remains in the album screen. This bridge is replaced there.
-  },
-};
 
 // ===============================
 // Styles
