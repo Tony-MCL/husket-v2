@@ -19,6 +19,7 @@ export type TranslationDictionary = {
     body: string;
     camera: string;
     photoFrame: string;
+    settings: string;
     emptyTitle: string;
     emptyBody: string;
     manageAlbums: string;
@@ -90,6 +91,19 @@ export type TranslationDictionary = {
     saveError: string;
     notFound: string;
   };
+  settings: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    back: string;
+    language: string;
+    norwegian: string;
+    english: string;
+    appearance: string;
+    light: string;
+    dark: string;
+    note: string;
+  };
 };
 
 export type TranslationPath =
@@ -99,4 +113,5 @@ export type TranslationPath =
   | `albums.${keyof TranslationDictionary["albums"]}`
   | `albumDetail.${keyof TranslationDictionary["albumDetail"]}`
   | `memories.${keyof TranslationDictionary["memories"]}`
-  | `memoryDetail.${keyof TranslationDictionary["memoryDetail"]}`;
+  | `memoryDetail.${keyof TranslationDictionary["memoryDetail"]}`
+  | `settings.${keyof TranslationDictionary["settings"]}`;
