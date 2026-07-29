@@ -12,7 +12,13 @@ export const bookshelfAssets = {
   walnut: require("../../../assets/bookshelf-walnut.png"),
 } satisfies Record<string, ImageSourcePropType>;
 
-export const libraryWallAsset = require("../../../assets/library-wall.png") as ImageSourcePropType;
+export const libraryWallAsset = require("../../../assets/wall1.png") as ImageSourcePropType;
+
+export const libraryShelfAssets = {
+  oak: require("../../../assets/shelf-oak.png"),
+  black: require("../../../assets/shelf-black.png"),
+  white: require("../../../assets/shelf-white.png"),
+} satisfies Record<string, ImageSourcePropType>;
 
 export const libraryObjectAssets = {
   camera: require("../../../assets/camera.png"),
@@ -32,3 +38,4 @@ export const albumSpineAssets: ImageSourcePropType[] = [
 ];
 
 export type BookshelfThemeId = keyof typeof bookshelfAssets;
+export type LibraryShelfThemeId = keyof typeof libraryShelfAssets;
