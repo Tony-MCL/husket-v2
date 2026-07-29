@@ -2,17 +2,21 @@
 // src/features/memories/services/memoryService.ts
 // ===============================
 
-import type {
-  ImportedMemory,
-  Memory,
-  MemoryMedia,
-  MemoryMood,
+import {
+  MAX_MEMORY_MEDIA_ITEMS,
+  type ImportedMemory,
+  type Memory,
+  type MemoryMedia,
+  type MemoryMood,
 } from "../../../models";
 import { memoryRepository } from "../../../storage";
 
 export type CreateMemoryInput = {
   albumId: string;
-  importedMemory: ImportedMemory;
+  /** Eksisterende ettbilde-flyt. Beholdes til opprettelsesskjermen er bygget om. */
+  importedMemory?: ImportedMemory;
+  /** Ny flerbilde-flyt. Ett minne kan inneholde mellom ett og tre bilder. */
+  importedMemories?: ImportedMemory[];
   comment?: string;
   mood?: MemoryMood;
 };
@@ -31,37 +35,66 @@ function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-/** Oppretter og lagrer et ferdig minne fra det normaliserte importformatet. */
+function resolveImportedMemories(input: CreateMemoryInput): ImportedMemory[] {
+  const hasSingleMemory = Boolean(input.importedMemory);
+  const hasMultipleMemories = Boolean(input.importedMemories);
+
+  if (hasSingleMemory && hasMultipleMemories) {
+    throw new Error("AMBIGUOUS_MEDIA_INPUT");
+  }
+
+  const importedMemories = input.importedMemories
+    ? [...input.importedMemories]
+    : input.importedMemory
+      ? [input.importedMemory]
+      : [];
+
+  if (importedMemories.length === 0) {
+    throw new Error("MEDIA_REQUIRED");
+  }
+
+  if (importedMemories.length > MAX_MEMORY_MEDIA_ITEMS) {
+    throw new Error("TOO_MANY_MEDIA_ITEMS");
+  }
+
+  return importedMemories;
+}
+
+function createMemoryMedia(importedMemory: ImportedMemory, createdAt: string): MemoryMedia {
+  return {
+    id: createId("media"),
+    type: "image",
+    localUri: importedMemory.localUri,
+    originalFileName: importedMemory.originalFileName,
+    mimeType: importedMemory.mimeType,
+    width: importedMemory.width,
+    height: importedMemory.height,
+    createdAt,
+  };
+}
+
+/** Oppretter og lagrer ett minne med mellom ett og tre bilder. */
 export async function createMemory(input: CreateMemoryInput): Promise<Memory> {
   if (!input.albumId.trim()) {
     throw new Error("ALBUM_REQUIRED");
   }
 
+  const importedMemories = resolveImportedMemories(input);
+  const primaryImportedMemory = importedMemories[0];
   const now = new Date().toISOString();
-  const imported = input.importedMemory;
-
-  const media: MemoryMedia = {
-    id: createId("media"),
-    type: "image",
-    localUri: imported.localUri,
-    originalFileName: imported.originalFileName,
-    mimeType: imported.mimeType,
-    width: imported.width,
-    height: imported.height,
-    createdAt: now,
-  };
-
   const comment = input.comment?.trim();
 
   const memory: Memory = {
     id: createId("memory"),
     albumId: input.albumId,
-    media: [media],
+    media: importedMemories.map((importedMemory) =>
+      createMemoryMedia(importedMemory, now),
+    ),
     comment: comment || undefined,
     mood: input.mood,
-    capturedAt: imported.capturedAt,
-    location: imported.location,
-    source: imported.source,
+    capturedAt: primaryImportedMemory.capturedAt,
+    location: primaryImportedMemory.location,
+    source: primaryImportedMemory.source,
     createdAt: now,
     updatedAt: now,
   };
