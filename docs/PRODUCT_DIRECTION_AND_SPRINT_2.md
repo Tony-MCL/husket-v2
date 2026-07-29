@@ -86,7 +86,7 @@ Et oppslag er en avgrenset albumvisning med rolig komposisjon. Oppslag skal erst
 
 ### Minne
 
-Et minne er det enkelte arkiverte øyeblikket og kan åpnes for visning og redigering.
+Et minne er ett husk'et og én albumside. Minnet kan inneholde ett eller flere bilder med ett felles sett metadata og kan åpnes for visning og redigering.
 
 ---
 
@@ -131,6 +131,20 @@ Bildene skal få puste.
 
 Oppslag skal brukes som hovedprinsipp fremfor endeløs scrolling.
 
+Grunnmodellen for albumet er:
+
+> Én albumside er ett minne og ett husk'et.
+
+Et minne kan i første versjon inneholde ett, to eller tre bilder. Alle bildene på siden deler én kommentar, én følelsesemoji, én dato og ett sted.
+
+Antallet bilder bestemmer grunnlayouten i første versjon:
+
+- ett bilde vises i en ettbildemal
+- to bilder vises i en tobildemal
+- tre bilder vises i en trebilde-mal med ett hovedbilde og to mindre bilder
+
+Senere kan brukeren få flere alternative komposisjoner for samme antall bilder og støtte for flere enn tre bilder i ett minne.
+
 Albumet skal kombinere følelsen av et fysisk fotoalbum med digitale fordeler som:
 
 - rask navigasjon
@@ -144,7 +158,7 @@ Realistisk sidevending er ikke fundamentet for albumarkitekturen. Det skal under
 
 Hvis sidevendingen ikke fungerer godt nok teknisk eller praktisk, skal albumopplevelsen fortsatt fungere fullt ut med rolig og tydelig navigasjon mellom oppslag.
 
-Detaljerte og styrende regler for sidemaler, fullskjermvisning, redigering, originalbilder, import, valgfri sletting etter import og eksport er dokumentert i `docs/ALBUM_AND_SHARING.md`.
+Detaljerte og styrende regler for minnemodell, sidemaler, fullskjermvisning, redigering, originalbilder, import, valgfri sletting etter import og eksport er dokumentert i `docs/ALBUM_AND_SHARING.md`.
 
 ---
 
@@ -157,13 +171,15 @@ Brukeren skal kunne dele både:
 - et nytt minne rett etter at det er opprettet
 - et eldre minne hentet fra et album
 
+Et delt minne skal alltid behandles som ett samlet husk'et, også når det inneholder flere bilder.
+
 Mottakeren skal møte samme delingsopplevelse uansett når minnet opprinnelig ble opprettet.
 
 Deling skal være direkte og privat mellom mennesker som betyr noe for hverandre.
 
-husk'et skal ikke ha chat. Mottakeren kan reagere med en emoji, og senderen får et enkelt push-varsel om reaksjonen.
+husk'et skal ikke ha chat. Mottakeren kan reagere med en emoji på hele husk'et, og senderen får et enkelt push-varsel om reaksjonen.
 
-Et mottatt minne skal ikke automatisk lagres i mottakerens album. Mottakeren velger selv om minnet skal arkiveres.
+Et mottatt minne skal ikke automatisk lagres i mottakerens album. Mottakeren velger selv om hele minnet skal arkiveres.
 
 Kortene fra husk'et v1 videreføres kun som delingspresentasjon. Albumet skal aldri bruke delingskort som permanent visning eller lagringsformat.
 
@@ -283,11 +299,13 @@ Bygge den første helhetlige opplevelsen av bibliotek, bokhylle, album og oppsla
 - representasjon av album på bokhyllen
 - åpning av album fra bokhyllen
 - oppslag som hovedvisning i albumet
-- faste sidemaler valgt av brukeren
-- lagring og senere endring av valgt sidemal
+- én albumside per minne
+- støtte for ett, to eller tre bilder i samme minne
+- én felles kommentar og ett felles sett metadata per minne
+- grunnlayout bestemt av antallet bilder
 - designerte felt for bilder, kommentar, dato, emoji og GPS-indikator
-- trykk på bilde åpner fullskjermvisning
-- egen handling for redigering av minnet
+- trykk på et bilde åpner dette bildet i fullskjermvisning
+- egen handling for redigering av hele minnet
 - rolig navigasjon mellom oppslag
 - åpning av enkeltminne fra oppslag
 - tilbakeføring til riktig sted i albumet
@@ -303,6 +321,8 @@ Bygge den første helhetlige opplevelsen av bibliotek, bokhylle, album og oppsla
 - push-varsler
 - permanent Media Library-lagring
 - avansert søk og filtrering
+- flere alternative komposisjoner for samme antall bilder
+- mer enn tre bilder i ett minne
 
 ### Ferdigkriterier
 
@@ -313,6 +333,8 @@ Bokhylle → Album → Oppslag → Minne → tilbake til samme oppslag
 ```
 
 Opplevelsen skal fungere uten realistisk sidevending.
+
+Et minne med ett, to eller tre bilder skal vises som én samlet albumside med ett felles metadatafelt.
 
 ---
 
@@ -348,11 +370,11 @@ Gjøre medielagringen stabil og produksjonsrettet på mobil.
 ### Omfang
 
 - kopiere importerte og fotograferte bilder til husk'ets eget lagringsområde
-- bevare originalfilen separat fra forhåndsvisning og miniatyr
+- bevare hver originalfil separat fra forhåndsvisning og miniatyr
 - stabile lokale filreferanser
 - thumbnails for bokhylle, album og oppslag
 - ryddig håndtering av originalbilder og forhåndsvisninger
-- fullskala eksport av lagret original uten påbrent metadata
+- fullskala eksport av ett valgt originalbilde eller alle originalbildene i et minne uten påbrent metadata
 - importdialog med valgfri sletting av originaler etter vellykket og verifisert kopiering
 - avhuking for sletting er alltid avslått som standard og huskes aldri mellom importer
 - sletting gjelder bare filer som er bekreftet trygt kopiert
@@ -383,8 +405,9 @@ Fastsette den tekniske og funksjonelle modellen for privat deling av minner.
 - identitet og kontaktmodell
 - hvordan venner og familie kobles sammen
 - hva som faktisk sendes
+- hvordan ett minne med flere bilder presenteres og overføres samlet
 - hvor lenge et mottatt minne er tilgjengelig
-- hvordan originalfil og metadata overføres
+- hvordan originalfiler og felles metadata overføres
 - hvordan delingskortet genereres
 - hvordan reaksjoner håndteres
 - hva som lagres hos sender og mottaker
@@ -408,8 +431,9 @@ Bygge mottakeropplevelsen for delte minner.
 - ingen brevbunke når innboksen er tom
 - enkel innboks uten feedpreg
 - åpning av mottatt delingskort
-- emoji-reaksjon
-- valget «Legg til i mitt album»
+- visning av alle bildene i det mottatte minnet
+- emoji-reaksjon på hele husk'et
+- valget «Legg til i mitt album» for hele minnet
 - valg eller opprettelse av album ved arkivering
 - tydelig skille mellom mottatt innhold og personlige album
 - ingen chat
@@ -430,18 +454,23 @@ Følgende beslutninger skal ikke endres gjennom tilfeldige UI-valg under impleme
 - bilderammen åpner import
 - brevbunken vises bare når mottatte husk'et finnes
 - album vises som oppslag
-- brukeren velger sidemal per side og kan endre den senere
-- valgt sidemal skal være stabil og skal ikke føre til tap av minner eller metadata
-- trykk på bilde åpner fullskjerm, mens redigering har en egen handling
+- ett husk'et er ett minne
+- én albumside er ett minne
+- ett minne kan inneholde ett eller flere bilder
+- ett minne har én felles kommentar, én følelsesemoji, én dato og ett sted
+- antallet bilder endrer presentasjonen, men ikke hva som regnes som ett minne
+- første versjon støtter ett, to eller tre bilder i samme minne
+- det innføres ikke en separat `AlbumPage`-modell i første versjon
+- trykk på et bilde åpner fullskjerm, mens redigering av hele minnet har en egen handling
 - album bruker aldri delingskort
 - delingskort brukes kun ved deling
-- originalbildet bevares separat fra optimaliserte visningsfiler
-- albumets beskjæring og metadata skal aldri endre eller brennes inn i originalbildet
-- import kopierer originalfilen til husk'ets eget lagringsområde
+- originalbildene bevares separat fra optimaliserte visningsfiler
+- albumets beskjæring og metadata skal aldri endre eller brennes inn i originalbildene
+- import kopierer originalfilene til husk'ets eget lagringsområde
 - valgfri sletting etter import er alltid avslått som standard og huskes aldri mellom importer
 - bare vellykket og verifisert kopierte originaler kan forespørres slettet
-- brukeren skal kunne eksportere originalbildet i full tilgjengelig kvalitet uten husk'et-metadata
-- eksport av originalbildet skal ikke ligge bak abonnement
+- brukeren skal kunne eksportere hvert originalbilde i full tilgjengelig kvalitet uten husk'et-metadata
+- eksport av originalbildene skal ikke ligge bak abonnement
 - bilder tatt direkte i husk'et lagres i husk'ets arkiv og trenger ikke automatisk lagres i kamerarullen
 - mottakeren velger selv om et delt minne skal legges i eget album
 - husk'et skal ikke ha chat
