@@ -16,7 +16,6 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLanguage } from "../../../i18n/LanguageProvider";
 import type { Album } from "../../../models";
@@ -106,7 +105,6 @@ function formatSpineTitle(title: string): string {
 
 export function LibraryScreen() {
   const { t } = useLanguage();
-  const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [albums, setAlbums] = useState<Album[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -312,19 +310,6 @@ export function LibraryScreen() {
           },
         ]}
       >
-        <View
-          pointerEvents="none"
-          style={[
-            styles.heading,
-            {
-              top: Math.max(12, insets.top - wallLayout.top + 4),
-            },
-          ]}
-        >
-          <Text style={styles.eyebrow}>{t("library.eyebrow")}</Text>
-          <Text style={styles.title}>{t("library.title")}</Text>
-        </View>
-
         <Image
           pointerEvents="none"
           source={libraryShelfAssets[ACTIVE_SHELF_THEME]}
@@ -625,24 +610,6 @@ const styles = StyleSheet.create({
   },
   wallCoordinateSpace: {
     position: "absolute",
-  },
-  heading: {
-    position: "absolute",
-    left: "5%",
-    zIndex: 20,
-  },
-  eyebrow: {
-    color: LIGHT_WALL_MUTED_TEXT,
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 1.35,
-    textTransform: "uppercase",
-  },
-  title: {
-    color: LIGHT_WALL_TEXT,
-    fontSize: 22,
-    lineHeight: 26,
-    fontWeight: "800",
   },
   cameraObject: {
     position: "absolute",
