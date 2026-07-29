@@ -2,8 +2,8 @@
 // src/features/albums/screens/AlbumDetailScreen.tsx
 // ===============================
 
-import { router } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -37,6 +37,8 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
   const { t } = useLanguage();
   const theme = useAppTheme();
   const { width: screenWidth } = useWindowDimensions();
+  const hasLoadedAlbum = useRef(false);
+
   const [album, setAlbum] = useState<Album | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [currentSpreadIndex, setCurrentSpreadIndex] = useState(0);
@@ -58,26 +60,37 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
     };
   }, [currentSpreadIndex, isCompact, memories, memoriesPerSpread]);
 
-  const loadAlbum = useCallback(async () => {
-    try {
-      setError(null);
-      const [loadedAlbum, loadedMemories] = await Promise.all([
-        getAlbumById(albumId),
-        getMemoriesByAlbumId(albumId),
-      ]);
-      setAlbum(loadedAlbum);
-      setMemories(loadedMemories);
-      setCurrentSpreadIndex(0);
-    } catch {
-      setError(t("albumDetail.loadError"));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [albumId, t]);
+  const loadAlbum = useCallback(
+    async (resetSpread: boolean) => {
+      try {
+        setError(null);
+        const [loadedAlbum, loadedMemories] = await Promise.all([
+          getAlbumById(albumId),
+          getMemoriesByAlbumId(albumId),
+        ]);
 
-  useEffect(() => {
-    void loadAlbum();
-  }, [loadAlbum]);
+        setAlbum(loadedAlbum);
+        setMemories(loadedMemories);
+
+        if (resetSpread) {
+          setCurrentSpreadIndex(0);
+        }
+      } catch {
+        setError(t("albumDetail.loadError"));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [albumId, t],
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const resetSpread = !hasLoadedAlbum.current;
+      hasLoadedAlbum.current = true;
+      void loadAlbum(resetSpread);
+    }, [loadAlbum]),
+  );
 
   useEffect(() => {
     setCurrentSpreadIndex((currentIndex) =>
