@@ -8,10 +8,10 @@ import { Image, StyleSheet, useWindowDimensions } from "react-native";
 import { libraryObjectAssets } from "../libraryAssets";
 
 const WALL_ASPECT_RATIO = 1024 / 1792;
-const MAIL_LEFT = 12.5;
-const MAIL_TOP = 15.7;
-const MAIL_WIDTH = 14.5;
-const MAIL_HEIGHT = 8.2;
+const MAIL_LEFT = 11.8;
+const MAIL_TOP = 15.9;
+const MAIL_WIDTH = 16;
+const MAIL_HEIGHT = 9;
 
 // ===============================
 // Received memory mail stack
