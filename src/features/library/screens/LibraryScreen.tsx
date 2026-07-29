@@ -32,7 +32,7 @@ import {
   libraryWallAsset,
 } from "../libraryAssets";
 
-const BOOKS_PER_SHELF = 10;
+const BOOKS_PER_SHELF = 11;
 const SHELF_COUNT = 4;
 const WALL_ASPECT_RATIO = 1024 / 1792;
 const LIGHT_WALL_TEXT = "#30251F";
@@ -48,7 +48,7 @@ const SHELF_TOPS = [28.6, 43, 57.4, 71.8];
 const SHELF_LEFT = 7.5;
 const SHELF_WIDTH = 85;
 const SHELF_HEIGHT = 7.2;
-const ALBUM_BOTTOM_OFFSET = 2.0;
+const ALBUM_BOTTOM_OFFSET = 1.9;
 const ALBUM_ROW_LEFT = 9;
 const ALBUM_ROW_RIGHT = 9;
 const ACTIVE_SHELF_THEME = "oak" as const;
