@@ -2,10 +2,15 @@
 // src/features/albums/components/AlbumPage.tsx
 // ===============================
 
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 import type { Memory, MemoryMood } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
+import {
+  SinglePhotoLayout,
+  ThreePhotoLayout,
+  TwoPhotoLayout,
+} from "./MemoryPhotoLayouts";
 
 const moodEmoji: Record<MemoryMood, string> = {
   love: "❤️",
@@ -22,10 +27,35 @@ type AlbumPageProps = {
   onPress: () => void;
 };
 
-/** Første albumside: ett minne med god luft, bilde, følelse og kommentar. */
+// ===============================
+// Photo layout selection
+// ===============================
+
+function renderPhotoLayout(memory: Memory) {
+  const [firstMedia, secondMedia, thirdMedia] = memory.media;
+
+  if (firstMedia && secondMedia && thirdMedia) {
+    return <ThreePhotoLayout media={[firstMedia, secondMedia, thirdMedia]} />;
+  }
+
+  if (firstMedia && secondMedia) {
+    return <TwoPhotoLayout media={[firstMedia, secondMedia]} />;
+  }
+
+  if (firstMedia) {
+    return <SinglePhotoLayout media={firstMedia} />;
+  }
+
+  return null;
+}
+
+// ===============================
+// Album page
+// ===============================
+
+/** Viser ett minne som én albumside med mellom ett og tre bilder. */
 export function AlbumPage({ memory, onPress }: AlbumPageProps) {
   const theme = useAppTheme();
-  const primaryMedia = memory.media[0];
 
   return (
     <Pressable
@@ -43,19 +73,7 @@ export function AlbumPage({ memory, onPress }: AlbumPageProps) {
         },
       ]}
     >
-      {primaryMedia ? (
-        <Image
-          source={{ uri: primaryMedia.localUri }}
-          resizeMode="contain"
-          style={[
-            styles.image,
-            {
-              backgroundColor: theme.colors.background,
-              borderRadius: theme.radii.md,
-            },
-          ]}
-        />
-      ) : null}
+      {renderPhotoLayout(memory)}
 
       {memory.mood ? (
         <Text style={styles.mood} accessibilityLabel={memory.mood}>
@@ -80,14 +98,14 @@ export function AlbumPage({ memory, onPress }: AlbumPageProps) {
   );
 }
 
+// ===============================
+// Styles
+// ===============================
+
 const styles = StyleSheet.create({
   page: {
     borderWidth: 1,
     width: "100%",
-  },
-  image: {
-    width: "100%",
-    aspectRatio: 4 / 3,
   },
   mood: {
     fontSize: 28,
