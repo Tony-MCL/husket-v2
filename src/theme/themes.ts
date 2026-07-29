@@ -8,6 +8,7 @@ export type AppTheme = {
     surfaceMuted: string;
     text: string;
     textMuted: string;
+    mutedText: string;
     border: string;
     accent: string;
     accentText: string;
@@ -25,6 +26,7 @@ export const lightTheme: AppTheme = {
     surfaceMuted: "#EEE4D5",
     text: "#2B2926",
     textMuted: "#6F6961",
+    mutedText: "#6F6961",
     border: "#D8CCBC",
     accent: "#566B5B",
     accentText: "#FFFFFF",
@@ -42,6 +44,7 @@ export const darkTheme: AppTheme = {
     surfaceMuted: "#35322E",
     text: "#F7F1E7",
     textMuted: "#C4BBB0",
+    mutedText: "#C4BBB0",
     border: "#49443E",
     accent: "#AFC2B2",
     accentText: "#1E1D1B",
