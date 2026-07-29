@@ -15,7 +15,8 @@
         "backgroundColor": "#EDE4D4",
         "foregroundImage": "./assets/husket-icon.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.morningcoffeelabs.husketv2"
     },
     "web": {
       "favicon": "./assets/husket-icon.png"
@@ -31,6 +32,12 @@
           "microphonePermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b7b38105-e2b1-4948-944b-74c4541d8e86"
+      }
+    }
   }
 }
