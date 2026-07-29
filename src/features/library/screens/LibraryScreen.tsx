@@ -28,22 +28,30 @@ import {
 import {
   albumSpineAssets,
   libraryObjectAssets,
+  libraryShelfAssets,
   libraryWallAsset,
 } from "../libraryAssets";
 
-const BOOKS_PER_SHELF = 5;
-const ALBUM_SHELF_TOPS = [19, 33.3, 47.6, 61.9];
-const BOOK_LEFT_POSITIONS = [8.5, 24, 39.5, 55, 70.5];
+const BOOKS_PER_SHELF = 10;
+const SHELF_COUNT = 4;
 const WALL_ASPECT_RATIO = 1024 / 1792;
 const LIGHT_WALL_TEXT = "#30251F";
 const LIGHT_WALL_MUTED_TEXT = "#6A574D";
 const SPINE_TITLE_MAX_CHARACTERS_PER_LINE = 18;
 const SPINE_TITLE_MAX_LINES = 2;
-const ALBUM_WIDTH_RATIO = 0.115;
+const ALBUM_WIDTH_RATIO = 0.072;
 const ALBUM_HEIGHT_RATIO = 0.132;
 const SPINE_LABEL_WIDTH_RATIO = 0.5;
 const SPINE_LABEL_HEIGHT_RATIO = 0.58;
 const SPINE_LABEL_TOP_RATIO = 0.21;
+const SHELF_TOPS = [28.6, 43, 57.4, 71.8];
+const SHELF_LEFT = 7.5;
+const SHELF_WIDTH = 85;
+const SHELF_HEIGHT = 7.2;
+const ALBUM_BOTTOM_OFFSET = 2.4;
+const ALBUM_ROW_LEFT = 9;
+const ALBUM_ROW_RIGHT = 9;
+const ACTIVE_SHELF_THEME = "oak" as const;
 
 // ===============================
 // Album spine title formatting
@@ -71,9 +79,10 @@ function formatSpineTitle(title: string): string {
       SPINE_TITLE_MAX_CHARACTERS_PER_LINE + 1,
     );
     const lastSpaceIndex = candidateLine.lastIndexOf(" ");
-    const splitIndex = lastSpaceIndex > 0
-      ? lastSpaceIndex
-      : SPINE_TITLE_MAX_CHARACTERS_PER_LINE;
+    const splitIndex =
+      lastSpaceIndex > 0
+        ? lastSpaceIndex
+        : SPINE_TITLE_MAX_CHARACTERS_PER_LINE;
 
     lines.push(remainingTitle.slice(0, splitIndex).trim());
     remainingTitle = remainingTitle.slice(splitIndex).trim();
@@ -125,7 +134,7 @@ export function LibraryScreen() {
   }, [loadAlbums]);
 
   const visibleAlbums = useMemo(
-    () => albums.slice(0, BOOKS_PER_SHELF * ALBUM_SHELF_TOPS.length),
+    () => albums.slice(0, BOOKS_PER_SHELF * SHELF_COUNT),
     [albums],
   );
 
@@ -175,6 +184,16 @@ export function LibraryScreen() {
     };
   }, [wallLayout.height, wallLayout.width]);
 
+  const albumPositions = useMemo(() => {
+    const usableWidth = 100 - ALBUM_ROW_LEFT - ALBUM_ROW_RIGHT;
+    const slotWidth = usableWidth / BOOKS_PER_SHELF;
+
+    return Array.from({ length: BOOKS_PER_SHELF }, (_, slotIndex) => {
+      const centeredSlotOffset = (slotWidth - ALBUM_WIDTH_RATIO * 100) / 2;
+      return ALBUM_ROW_LEFT + slotIndex * slotWidth + centeredSlotOffset;
+    });
+  }, []);
+
   function openAlbum(albumId: string) {
     router.push({
       pathname: "/albums/[albumId]",
@@ -185,10 +204,12 @@ export function LibraryScreen() {
   function getBookPosition(index: number) {
     const shelfIndex = Math.floor(index / BOOKS_PER_SHELF);
     const slotIndex = index % BOOKS_PER_SHELF;
+    const shelfTop = SHELF_TOPS[shelfIndex];
+    const albumTop = shelfTop - ALBUM_HEIGHT_RATIO * 100 + ALBUM_BOTTOM_OFFSET;
 
     return {
-      left: `${BOOK_LEFT_POSITIONS[slotIndex]}%` as const,
-      top: `${ALBUM_SHELF_TOPS[shelfIndex]}%` as const,
+      left: `${albumPositions[slotIndex]}%` as const,
+      top: `${albumTop}%` as const,
     };
   }
 
@@ -266,7 +287,7 @@ export function LibraryScreen() {
 
   const addBookIndex = Math.min(
     visibleAlbums.length,
-    BOOKS_PER_SHELF * ALBUM_SHELF_TOPS.length - 1,
+    BOOKS_PER_SHELF * SHELF_COUNT - 1,
   );
 
   return (
@@ -346,6 +367,24 @@ export function LibraryScreen() {
             />
           </View>
         </Pressable>
+
+        {SHELF_TOPS.map((shelfTop, shelfIndex) => (
+          <Image
+            key={`shelf-${shelfIndex}`}
+            pointerEvents="none"
+            source={libraryShelfAssets[ACTIVE_SHELF_THEME]}
+            resizeMode="contain"
+            style={[
+              styles.shelf,
+              {
+                left: `${SHELF_LEFT}%`,
+                top: `${shelfTop}%`,
+                width: `${SHELF_WIDTH}%`,
+                height: `${SHELF_HEIGHT}%`,
+              },
+            ]}
+          />
+        ))}
 
         {isLoading ? (
           <View style={styles.statusOverlay}>
@@ -574,7 +613,7 @@ const styles = StyleSheet.create({
   heading: {
     position: "absolute",
     left: "5%",
-    zIndex: 10,
+    zIndex: 20,
   },
   eyebrow: {
     color: LIGHT_WALL_MUTED_TEXT,
@@ -595,7 +634,7 @@ const styles = StyleSheet.create({
     top: "6.1%",
     width: "10.5%",
     height: "6.4%",
-    zIndex: 8,
+    zIndex: 18,
   },
   frameObject: {
     position: "absolute",
@@ -603,7 +642,7 @@ const styles = StyleSheet.create({
     top: "3.9%",
     width: "13.5%",
     height: "9.2%",
-    zIndex: 8,
+    zIndex: 18,
   },
   objectImage: {
     width: "100%",
@@ -624,13 +663,17 @@ const styles = StyleSheet.create({
     opacity: 0.76,
     transform: [{ translateY: 2 }, { scale: 0.98 }],
   },
+  shelf: {
+    position: "absolute",
+    zIndex: 5,
+  },
   albumBook: {
     position: "absolute",
-    width: "11.5%",
-    height: "13.2%",
+    width: `${ALBUM_WIDTH_RATIO * 100}%`,
+    height: `${ALBUM_HEIGHT_RATIO * 100}%`,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 6,
+    zIndex: 10,
   },
   pressedBook: {
     opacity: 0.78,
@@ -678,6 +721,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#fff7efd9",
     paddingHorizontal: 14,
+    zIndex: 30,
   },
   statusText: {
     color: LIGHT_WALL_TEXT,
@@ -689,7 +733,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: "14%",
     right: "14%",
-    top: "77%",
+    top: "80%",
     color: LIGHT_WALL_MUTED_TEXT,
     fontSize: 12,
     lineHeight: 17,
