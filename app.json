@@ -31,6 +31,12 @@
           "cameraPermission": "husk'et trenger tilgang til kameraet for at du skal kunne ta bilder til minnene dine.",
           "microphonePermission": false
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "husk'et bruker posisjonen din for å lagre GPS-koordinater på bilder du tar i appen."
+        }
       ]
     ],
     "extra": {
