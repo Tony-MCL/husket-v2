@@ -17,7 +17,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useLanguage } from "../../../i18n/LanguageProvider";
-import type { Album, Memory, MemoryMood } from "../../../models";
+import type {
+  Album,
+  Memory,
+  MemoryMedia,
+  MemoryMood,
+} from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { getAlbums } from "../../albums/services/albumService";
 import { getMemoryById, updateMemory } from "../services/memoryService";
@@ -41,6 +46,7 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
   const theme = useAppTheme();
   const [memory, setMemory] = useState<Memory | null>(null);
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [media, setMedia] = useState<MemoryMedia[]>([]);
   const [comment, setComment] = useState("");
   const [mood, setMood] = useState<MemoryMood | undefined>();
   const [albumId, setAlbumId] = useState("");
@@ -60,6 +66,7 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
       setAlbums(loadedAlbums);
 
       if (loadedMemory) {
+        setMedia(loadedMemory.media);
         setComment(loadedMemory.comment ?? "");
         setMood(loadedMemory.mood);
         setAlbumId(loadedMemory.albumId);
@@ -75,14 +82,33 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
     void loadData();
   }, [loadData]);
 
+  function moveMedia(fromIndex: number, toIndex: number) {
+    if (toIndex < 0 || toIndex >= media.length) return;
+
+    setMedia((current) => {
+      const reordered = [...current];
+      const [movedItem] = reordered.splice(fromIndex, 1);
+      reordered.splice(toIndex, 0, movedItem);
+      return reordered;
+    });
+  }
+
+  function removeMedia(indexToRemove: number) {
+    if (media.length <= 1) return;
+    setMedia((current) =>
+      current.filter((_, index) => index !== indexToRemove),
+    );
+  }
+
   async function handleSave() {
-    if (!memory || !albumId || isSaving) return;
+    if (!memory || !albumId || media.length === 0 || isSaving) return;
 
     try {
       setIsSaving(true);
       setError(null);
       const updatedMemory = await updateMemory(memory.id, {
         albumId,
+        media,
         comment,
         mood,
       });
@@ -94,8 +120,6 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
       setIsSaving(false);
     }
   }
-
-  const primaryMedia = memory?.media[0];
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}> 
@@ -137,19 +161,55 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
               </Text>
             </View>
 
-            {primaryMedia ? (
-              <Image
-                source={{ uri: primaryMedia.localUri }}
-                resizeMode="contain"
-                style={[
-                  styles.image,
-                  {
-                    backgroundColor: theme.colors.surface,
-                    borderRadius: theme.radii.lg,
-                  },
-                ]}
-              />
-            ) : null}
+            <View style={styles.mediaGrid}>
+              {media.map((item, index) => (
+                <View key={item.id} style={styles.mediaItem}>
+                  <Image
+                    source={{ uri: item.localUri }}
+                    resizeMode="cover"
+                    style={[
+                      styles.image,
+                      {
+                        backgroundColor: theme.colors.surface,
+                        borderRadius: theme.radii.lg,
+                      },
+                    ]}
+                  />
+                  <View style={styles.mediaControls}>
+                    <Pressable
+                      disabled={index === 0}
+                      onPress={() => moveMedia(index, index - 1)}
+                      style={[
+                        styles.mediaControlButton,
+                        index === 0 ? styles.disabledControl : null,
+                      ]}
+                    >
+                      <Text style={styles.mediaControlText}>←</Text>
+                    </Pressable>
+                    <Pressable
+                      disabled={media.length <= 1}
+                      onPress={() => removeMedia(index)}
+                      style={[
+                        styles.mediaControlButton,
+                        media.length <= 1 ? styles.disabledControl : null,
+                      ]}
+                    >
+                      <Text style={styles.mediaControlText}>×</Text>
+                    </Pressable>
+                    <Pressable
+                      disabled={index === media.length - 1}
+                      onPress={() => moveMedia(index, index + 1)}
+                      style={[
+                        styles.mediaControlButton,
+                        index === media.length - 1 ? styles.disabledControl : null,
+                      ]}
+                    >
+                      <Text style={styles.mediaControlText}>→</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
+            </View>
 
             <TextInput
               value={comment}
@@ -235,7 +295,7 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
             </View>
 
             <Pressable
-              disabled={!albumId || isSaving}
+              disabled={!albumId || media.length === 0 || isSaving}
               onPress={() => void handleSave()}
               style={({ pressed }) => [
                 styles.saveButton,
@@ -243,7 +303,12 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
                   backgroundColor: theme.colors.accent,
                   borderRadius: theme.radii.md,
                   padding: theme.spacing.md,
-                  opacity: !albumId || isSaving ? 0.45 : pressed ? 0.8 : 1,
+                  opacity:
+                    !albumId || media.length === 0 || isSaving
+                      ? 0.45
+                      : pressed
+                        ? 0.8
+                        : 1,
                 },
               ]}
             >
@@ -270,7 +335,40 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   title: { fontWeight: "800" },
-  image: { width: "100%", aspectRatio: 4 / 3 },
+  mediaGrid: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  mediaItem: {
+    flex: 1,
+    minWidth: 0,
+  },
+  image: {
+    width: "100%",
+    aspectRatio: 1,
+  },
+  mediaControls: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 6,
+    marginTop: 8,
+  },
+  mediaControlButton: {
+    width: 34,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 17,
+    backgroundColor: "#00000018",
+  },
+  disabledControl: {
+    opacity: 0.25,
+  },
+  mediaControlText: {
+    fontSize: 18,
+    lineHeight: 20,
+    fontWeight: "700",
+  },
   input: { borderWidth: 1, fontSize: 16 },
   commentInput: { minHeight: 112, textAlignVertical: "top" },
   sectionTitle: { fontSize: 18, fontWeight: "700" },
