@@ -17,7 +17,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useLanguage } from "../../../i18n/LanguageProvider";
-import type { Album, ImportedMemory, MemoryMood } from "../../../models";
+import {
+  MAX_MEMORY_MEDIA_ITEMS,
+  type Album,
+  type ImportedMemory,
+  type MemoryMood,
+} from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { getAlbums } from "../../albums/services/albumService";
 import { createMemory } from "../services/memoryService";
@@ -42,13 +47,23 @@ type AddMemoryScreenProps = {
   initialSource?: MemorySource;
 };
 
+function appendUniqueMedia(
+  current: ImportedMemory[],
+  incoming: ImportedMemory[],
+): ImportedMemory[] {
+  const knownUris = new Set(current.map((item) => item.localUri));
+  const uniqueIncoming = incoming.filter((item) => !knownUris.has(item.localUri));
+
+  return [...current, ...uniqueIncoming].slice(0, MAX_MEMORY_MEDIA_ITEMS);
+}
+
 export function AddMemoryScreen({ initialSource }: AddMemoryScreenProps) {
   const { t } = useLanguage();
   const theme = useAppTheme();
   const initialSourceOpened = useRef(false);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
-  const [importedMemory, setImportedMemory] = useState<ImportedMemory | null>(null);
+  const [importedMemories, setImportedMemories] = useState<ImportedMemory[]>([]);
   const [comment, setComment] = useState("");
   const [selectedMood, setSelectedMood] = useState<MemoryMood | undefined>();
   const [isImporting, setIsImporting] = useState(false);
@@ -73,15 +88,24 @@ export function AddMemoryScreen({ initialSource }: AddMemoryScreenProps) {
   }, [t]);
 
   async function handleImport(source: MemorySource) {
+    if (importedMemories.length >= MAX_MEMORY_MEDIA_ITEMS) return;
+
     try {
       setError(null);
       setIsImporting(true);
-      const result =
-        source === "camera"
-          ? await importFromCamera()
-          : await importFromPhotoLibrary();
+      const remainingSlots = MAX_MEMORY_MEDIA_ITEMS - importedMemories.length;
 
-      if (result) setImportedMemory(result);
+      if (source === "camera") {
+        const result = await importFromCamera();
+        if (result) {
+          setImportedMemories((current) => appendUniqueMedia(current, [result]));
+        }
+      } else {
+        const result = await importFromPhotoLibrary(remainingSlots);
+        if (result) {
+          setImportedMemories((current) => appendUniqueMedia(current, result));
+        }
+      }
     } catch (caughtError) {
       setError(
         caughtError instanceof Error &&
@@ -100,15 +124,21 @@ export function AddMemoryScreen({ initialSource }: AddMemoryScreenProps) {
     void handleImport(initialSource);
   }, [initialSource]);
 
+  function removeImportedMemory(indexToRemove: number) {
+    setImportedMemories((current) =>
+      current.filter((_, index) => index !== indexToRemove),
+    );
+  }
+
   async function handleSave() {
-    if (!importedMemory || !selectedAlbumId || isSaving) return;
+    if (importedMemories.length === 0 || !selectedAlbumId || isSaving) return;
 
     try {
       setError(null);
       setIsSaving(true);
       await createMemory({
         albumId: selectedAlbumId,
-        importedMemory,
+        importedMemories,
         comment,
         mood: selectedMood,
       });
@@ -119,6 +149,8 @@ export function AddMemoryScreen({ initialSource }: AddMemoryScreenProps) {
       setIsSaving(false);
     }
   }
+
+  const canAddMore = importedMemories.length < MAX_MEMORY_MEDIA_ITEMS;
 
   return (
     <SafeAreaView
@@ -159,7 +191,7 @@ export function AddMemoryScreen({ initialSource }: AddMemoryScreenProps) {
           </Text>
         </View>
 
-        {!importedMemory ? (
+        {importedMemories.length === 0 ? (
           <View style={{ gap: theme.spacing.md }}>
             <Pressable
               disabled={isImporting}
@@ -218,11 +250,70 @@ export function AddMemoryScreen({ initialSource }: AddMemoryScreenProps) {
               },
             ]}
           >
-            <Image
-              source={{ uri: importedMemory.localUri }}
-              resizeMode="contain"
-              style={[styles.previewImage, { borderRadius: theme.radii.md }]}
-            />
+            <View style={styles.mediaHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}> 
+                {importedMemories.length} / {MAX_MEMORY_MEDIA_ITEMS}
+              </Text>
+            </View>
+
+            <View style={styles.previewGrid}>
+              {importedMemories.map((item, index) => (
+                <View key={`${item.localUri}-${index}`} style={styles.previewItem}>
+                  <Image
+                    source={{ uri: item.localUri }}
+                    resizeMode="cover"
+                    style={[
+                      styles.previewImage,
+                      { borderRadius: theme.radii.md },
+                    ]}
+                  />
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => removeImportedMemory(index)}
+                    style={styles.removeButton}
+                  >
+                    <Text style={styles.removeButtonText}>×</Text>
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+
+            {canAddMore ? (
+              <View style={styles.addMoreRow}>
+                <Pressable
+                  disabled={isImporting}
+                  onPress={() => void handleImport("camera")}
+                  style={({ pressed }) => [
+                    styles.addMoreButton,
+                    {
+                      borderColor: theme.colors.border,
+                      borderRadius: theme.radii.md,
+                      opacity: isImporting ? 0.55 : pressed ? 0.75 : 1,
+                    },
+                  ]}
+                >
+                  <Text style={{ color: theme.colors.text, fontWeight: "700" }}>
+                    {t("memories.camera")}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  disabled={isImporting}
+                  onPress={() => void handleImport("photo-library")}
+                  style={({ pressed }) => [
+                    styles.addMoreButton,
+                    {
+                      borderColor: theme.colors.border,
+                      borderRadius: theme.radii.md,
+                      opacity: isImporting ? 0.55 : pressed ? 0.75 : 1,
+                    },
+                  ]}
+                >
+                  <Text style={{ color: theme.colors.text, fontWeight: "700" }}>
+                    {t("memories.photoLibrary")}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null}
 
             <TextInput
               value={comment}
@@ -358,10 +449,51 @@ const styles = StyleSheet.create({
   sourceButton: { borderWidth: 1, gap: 6 },
   sourceTitle: { fontSize: 18, fontWeight: "700" },
   editorPanel: { borderWidth: 1 },
+  mediaHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  previewGrid: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  previewItem: {
+    flex: 1,
+    minWidth: 0,
+    aspectRatio: 1,
+  },
   previewImage: {
     width: "100%",
-    aspectRatio: 4 / 3,
+    height: "100%",
     backgroundColor: "#00000010",
+  },
+  removeButton: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    width: 30,
+    height: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 15,
+    backgroundColor: "#000000A8",
+  },
+  removeButtonText: {
+    color: "#FFFFFF",
+    fontSize: 22,
+    lineHeight: 24,
+    fontWeight: "700",
+  },
+  addMoreRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  addMoreButton: {
+    flex: 1,
+    minHeight: 46,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
   },
   input: { borderWidth: 1, fontSize: 16 },
   commentInput: { minHeight: 92, textAlignVertical: "top" },
