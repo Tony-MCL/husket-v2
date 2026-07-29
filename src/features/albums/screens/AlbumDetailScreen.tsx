@@ -3,13 +3,14 @@
 // ===============================
 
 import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,20 +19,41 @@ import { useLanguage } from "../../../i18n/LanguageProvider";
 import type { Album, Memory } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { getMemoriesByAlbumId } from "../../memories/services/memoryService";
-import { AlbumPage } from "../components/AlbumPage";
+import { AlbumSpread } from "../components/AlbumSpread";
 import { getAlbumById } from "../services/albumService";
+
+const COMPACT_ALBUM_BREAKPOINT = 720;
 
 type AlbumDetailScreenProps = {
   albumId: string;
 };
 
+// ===============================
+// Album detail screen
+// ===============================
+
 export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
   const { t } = useLanguage();
   const theme = useAppTheme();
+  const { width: screenWidth } = useWindowDimensions();
   const [album, setAlbum] = useState<Album | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
+  const [currentSpreadIndex, setCurrentSpreadIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const isCompact = screenWidth < COMPACT_ALBUM_BREAKPOINT;
+  const memoriesPerSpread = isCompact ? 1 : 2;
+  const spreadCount = Math.ceil(memories.length / memoriesPerSpread);
+
+  const currentSpreadMemories = useMemo(() => {
+    const firstMemoryIndex = currentSpreadIndex * memoriesPerSpread;
+
+    return {
+      leftMemory: memories[firstMemoryIndex],
+      rightMemory: isCompact ? undefined : memories[firstMemoryIndex + 1],
+    };
+  }, [currentSpreadIndex, isCompact, memories, memoriesPerSpread]);
 
   const loadAlbum = useCallback(async () => {
     try {
@@ -42,6 +64,7 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
       ]);
       setAlbum(loadedAlbum);
       setMemories(loadedMemories);
+      setCurrentSpreadIndex(0);
     } catch {
       setError(t("albumDetail.loadError"));
     } finally {
@@ -53,15 +76,40 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
     void loadAlbum();
   }, [loadAlbum]);
 
+  useEffect(() => {
+    setCurrentSpreadIndex((currentIndex) =>
+      Math.min(currentIndex, Math.max(spreadCount - 1, 0)),
+    );
+  }, [spreadCount]);
+
+  function openMemory(memoryId: string) {
+    router.push(`/memories/${memoryId}`);
+  }
+
+  function showPreviousSpread() {
+    setCurrentSpreadIndex((currentIndex) => Math.max(currentIndex - 1, 0));
+  }
+
+  function showNextSpread() {
+    setCurrentSpreadIndex((currentIndex) =>
+      Math.min(currentIndex + 1, Math.max(spreadCount - 1, 0)),
+    );
+  }
+
+  const canShowPreviousSpread = currentSpreadIndex > 0;
+  const canShowNextSpread = currentSpreadIndex < spreadCount - 1;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}> 
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
+    >
       <ScrollView
         contentContainerStyle={[
           styles.content,
           { padding: theme.spacing.lg, gap: theme.spacing.lg },
         ]}
       >
-        <Pressable onPress={() => router.replace("/")}> 
+        <Pressable onPress={() => router.replace("/")}>
           <Text style={{ color: theme.colors.accent, fontWeight: "700" }}>
             {t("albumDetail.back")}
           </Text>
@@ -71,7 +119,9 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         {!isLoading && !error && !album ? (
-          <Text style={{ color: theme.colors.textMuted }}>{t("albumDetail.notFound")}</Text>
+          <Text style={{ color: theme.colors.textMuted }}>
+            {t("albumDetail.notFound")}
+          </Text>
         ) : null}
 
         {album ? (
@@ -92,7 +142,10 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
                 <Text
                   style={[
                     styles.body,
-                    { color: theme.colors.textMuted, fontSize: theme.typography.body },
+                    {
+                      color: theme.colors.textMuted,
+                      fontSize: theme.typography.body,
+                    },
                   ]}
                 >
                   {album.description}
@@ -115,17 +168,85 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
                   {t("albumDetail.empty")}
                 </Text>
               </View>
-            ) : (
-              <View style={{ gap: theme.spacing.xl }}>
-                {memories.map((memory) => (
-                  <AlbumPage
-                    key={memory.id}
-                    memory={memory}
-                    onPress={() => router.push(`/memories/${memory.id}`)}
-                  />
-                ))}
-              </View>
-            )}
+            ) : currentSpreadMemories.leftMemory ? (
+              <>
+                <AlbumSpread
+                  leftMemory={currentSpreadMemories.leftMemory}
+                  rightMemory={currentSpreadMemories.rightMemory}
+                  isCompact={isCompact}
+                  onOpenMemory={openMemory}
+                />
+
+                <View style={styles.navigationRow}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Previous album spread"
+                    disabled={!canShowPreviousSpread}
+                    onPress={showPreviousSpread}
+                    style={({ pressed }) => [
+                      styles.navigationButton,
+                      {
+                        backgroundColor: theme.colors.surface,
+                        borderColor: theme.colors.border,
+                        borderRadius: theme.radii.pill,
+                        opacity: !canShowPreviousSpread
+                          ? 0.3
+                          : pressed
+                            ? 0.7
+                            : 1,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.navigationButtonText,
+                        { color: theme.colors.text },
+                      ]}
+                    >
+                      ‹
+                    </Text>
+                  </Pressable>
+
+                  <Text
+                    style={[
+                      styles.pageIndicator,
+                      { color: theme.colors.textMuted },
+                    ]}
+                  >
+                    {currentSpreadIndex + 1} / {spreadCount}
+                  </Text>
+
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Next album spread"
+                    disabled={!canShowNextSpread}
+                    onPress={showNextSpread}
+                    style={({ pressed }) => [
+                      styles.navigationButton,
+                      {
+                        backgroundColor: theme.colors.surface,
+                        borderColor: theme.colors.border,
+                        borderRadius: theme.radii.pill,
+                        opacity: !canShowNextSpread
+                          ? 0.3
+                          : pressed
+                            ? 0.7
+                            : 1,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.navigationButtonText,
+                        { color: theme.colors.text },
+                      ]}
+                    >
+                      ›
+                    </Text>
+                  </Pressable>
+                </View>
+              </>
+            ) : null}
           </>
         ) : null}
       </ScrollView>
@@ -133,12 +254,61 @@ export function AlbumDetailScreen({ albumId }: AlbumDetailScreenProps) {
   );
 }
 
+// ===============================
+// Styles
+// ===============================
+
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  content: { width: "100%", maxWidth: 760, alignSelf: "center" },
-  eyebrow: { fontSize: 13, fontWeight: "700", letterSpacing: 1.2, textTransform: "uppercase" },
-  title: { fontWeight: "800" },
-  body: { lineHeight: 24 },
-  emptyState: { borderWidth: 1, borderStyle: "dashed" },
-  error: { color: "#b42318", fontWeight: "600" },
+  safeArea: {
+    flex: 1,
+  },
+  content: {
+    width: "100%",
+    maxWidth: 1120,
+    alignSelf: "center",
+  },
+  eyebrow: {
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+  },
+  title: {
+    fontWeight: "800",
+  },
+  body: {
+    lineHeight: 24,
+  },
+  emptyState: {
+    borderWidth: 1,
+    borderStyle: "dashed",
+  },
+  navigationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 18,
+  },
+  navigationButton: {
+    width: 48,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+  },
+  navigationButtonText: {
+    fontSize: 32,
+    lineHeight: 34,
+    fontWeight: "500",
+  },
+  pageIndicator: {
+    minWidth: 64,
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  error: {
+    color: "#b42318",
+    fontWeight: "600",
+  },
 });
