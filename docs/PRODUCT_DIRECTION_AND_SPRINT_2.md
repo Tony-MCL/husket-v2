@@ -144,6 +144,8 @@ Realistisk sidevending er ikke fundamentet for albumarkitekturen. Det skal under
 
 Hvis sidevendingen ikke fungerer godt nok teknisk eller praktisk, skal albumopplevelsen fortsatt fungere fullt ut med rolig og tydelig navigasjon mellom oppslag.
 
+Detaljerte og styrende regler for sidemaler, fullskjermvisning, redigering, originalbilder, import, valgfri sletting etter import og eksport er dokumentert i `docs/ALBUM_AND_SHARING.md`.
+
 ---
 
 ## 6. Deling
@@ -281,6 +283,11 @@ Bygge den første helhetlige opplevelsen av bibliotek, bokhylle, album og oppsla
 - representasjon av album på bokhyllen
 - åpning av album fra bokhyllen
 - oppslag som hovedvisning i albumet
+- faste sidemaler valgt av brukeren
+- lagring og senere endring av valgt sidemal
+- designerte felt for bilder, kommentar, dato, emoji og GPS-indikator
+- trykk på bilde åpner fullskjermvisning
+- egen handling for redigering av minnet
 - rolig navigasjon mellom oppslag
 - åpning av enkeltminne fra oppslag
 - tilbakeføring til riktig sted i albumet
@@ -341,9 +348,15 @@ Gjøre medielagringen stabil og produksjonsrettet på mobil.
 ### Omfang
 
 - kopiere importerte og fotograferte bilder til husk'ets eget lagringsområde
+- bevare originalfilen separat fra forhåndsvisning og miniatyr
 - stabile lokale filreferanser
 - thumbnails for bokhylle, album og oppslag
 - ryddig håndtering av originalbilder og forhåndsvisninger
+- fullskala eksport av lagret original uten påbrent metadata
+- importdialog med valgfri sletting av originaler etter vellykket og verifisert kopiering
+- avhuking for sletting er alltid avslått som standard og huskes aldri mellom importer
+- sletting gjelder bare filer som er bekreftet trygt kopiert
+- systemgodkjenning for sletting brukes når plattformen krever det
 - gjenoppretting etter omstart av appen
 - håndtering av slettede eller utilgjengelige kildefiler
 - nødvendig migrering fra midlertidige URI-er
@@ -354,6 +367,8 @@ Gjøre medielagringen stabil og produksjonsrettet på mobil.
 Sprint 2B gjelder lokal og stabil mediehåndtering.
 
 Den skal ikke automatisk utvides til skylagring, Firebase eller delingsbackend.
+
+De detaljerte sikkerhets- og brukerreglene for originalfiler, import og eksport er låst i `docs/ALBUM_AND_SHARING.md`.
 
 ---
 
@@ -415,8 +430,19 @@ Følgende beslutninger skal ikke endres gjennom tilfeldige UI-valg under impleme
 - bilderammen åpner import
 - brevbunken vises bare når mottatte husk'et finnes
 - album vises som oppslag
+- brukeren velger sidemal per side og kan endre den senere
+- valgt sidemal skal være stabil og skal ikke føre til tap av minner eller metadata
+- trykk på bilde åpner fullskjerm, mens redigering har en egen handling
 - album bruker aldri delingskort
 - delingskort brukes kun ved deling
+- originalbildet bevares separat fra optimaliserte visningsfiler
+- albumets beskjæring og metadata skal aldri endre eller brennes inn i originalbildet
+- import kopierer originalfilen til husk'ets eget lagringsområde
+- valgfri sletting etter import er alltid avslått som standard og huskes aldri mellom importer
+- bare vellykket og verifisert kopierte originaler kan forespørres slettet
+- brukeren skal kunne eksportere originalbildet i full tilgjengelig kvalitet uten husk'et-metadata
+- eksport av originalbildet skal ikke ligge bak abonnement
+- bilder tatt direkte i husk'et lagres i husk'ets arkiv og trenger ikke automatisk lagres i kamerarullen
 - mottakeren velger selv om et delt minne skal legges i eget album
 - husk'et skal ikke ha chat
 - varsler skal representere virkelige hendelser eller tidsmessig relevante tilbakeblikk
