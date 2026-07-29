@@ -2,7 +2,7 @@
 // src/features/albums/components/MemoryPhotoLayouts.tsx
 // ===============================
 
-import { Image, StyleSheet, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 import type { MemoryMedia } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
@@ -14,24 +14,36 @@ import { useAppTheme } from "../../../theme/useAppTheme";
 type MemoryPhotoProps = {
   media: MemoryMedia;
   aspectRatio?: number;
+  onPress: () => void;
 };
 
-function MemoryPhoto({ media, aspectRatio = 4 / 3 }: MemoryPhotoProps) {
+function MemoryPhoto({ media, aspectRatio = 4 / 3, onPress }: MemoryPhotoProps) {
   const theme = useAppTheme();
 
   return (
-    <Image
-      source={{ uri: media.localUri }}
-      resizeMode="cover"
-      style={[
-        styles.photo,
-        {
-          aspectRatio,
-          backgroundColor: theme.colors.background,
-          borderRadius: theme.radii.md,
-        },
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Open photo fullscreen"
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.photoButton,
+        { borderRadius: theme.radii.md },
+        pressed ? styles.pressedPhoto : null,
       ]}
-    />
+    >
+      <Image
+        source={{ uri: media.localUri }}
+        resizeMode="cover"
+        style={[
+          styles.photo,
+          {
+            aspectRatio,
+            backgroundColor: theme.colors.background,
+            borderRadius: theme.radii.md,
+          },
+        ]}
+      />
+    </Pressable>
   );
 }
 
@@ -41,10 +53,20 @@ function MemoryPhoto({ media, aspectRatio = 4 / 3 }: MemoryPhotoProps) {
 
 type SinglePhotoLayoutProps = {
   media: MemoryMedia;
+  onOpenPhoto: (photoIndex: number) => void;
 };
 
-export function SinglePhotoLayout({ media }: SinglePhotoLayoutProps) {
-  return <MemoryPhoto media={media} aspectRatio={4 / 3} />;
+export function SinglePhotoLayout({
+  media,
+  onOpenPhoto,
+}: SinglePhotoLayoutProps) {
+  return (
+    <MemoryPhoto
+      media={media}
+      aspectRatio={4 / 3}
+      onPress={() => onOpenPhoto(0)}
+    />
+  );
 }
 
 // ===============================
@@ -53,16 +75,25 @@ export function SinglePhotoLayout({ media }: SinglePhotoLayoutProps) {
 
 type TwoPhotoLayoutProps = {
   media: [MemoryMedia, MemoryMedia];
+  onOpenPhoto: (photoIndex: number) => void;
 };
 
-export function TwoPhotoLayout({ media }: TwoPhotoLayoutProps) {
+export function TwoPhotoLayout({ media, onOpenPhoto }: TwoPhotoLayoutProps) {
   return (
     <View style={styles.twoPhotoGrid}>
       <View style={styles.equalColumn}>
-        <MemoryPhoto media={media[0]} aspectRatio={3 / 4} />
+        <MemoryPhoto
+          media={media[0]}
+          aspectRatio={3 / 4}
+          onPress={() => onOpenPhoto(0)}
+        />
       </View>
       <View style={styles.equalColumn}>
-        <MemoryPhoto media={media[1]} aspectRatio={3 / 4} />
+        <MemoryPhoto
+          media={media[1]}
+          aspectRatio={3 / 4}
+          onPress={() => onOpenPhoto(1)}
+        />
       </View>
     </View>
   );
@@ -74,17 +105,30 @@ export function TwoPhotoLayout({ media }: TwoPhotoLayoutProps) {
 
 type ThreePhotoLayoutProps = {
   media: [MemoryMedia, MemoryMedia, MemoryMedia];
+  onOpenPhoto: (photoIndex: number) => void;
 };
 
-export function ThreePhotoLayout({ media }: ThreePhotoLayoutProps) {
+export function ThreePhotoLayout({ media, onOpenPhoto }: ThreePhotoLayoutProps) {
   return (
     <View style={styles.threePhotoGrid}>
       <View style={styles.heroColumn}>
-        <MemoryPhoto media={media[0]} aspectRatio={3 / 4} />
+        <MemoryPhoto
+          media={media[0]}
+          aspectRatio={3 / 4}
+          onPress={() => onOpenPhoto(0)}
+        />
       </View>
       <View style={styles.stackColumn}>
-        <MemoryPhoto media={media[1]} aspectRatio={4 / 3} />
-        <MemoryPhoto media={media[2]} aspectRatio={4 / 3} />
+        <MemoryPhoto
+          media={media[1]}
+          aspectRatio={4 / 3}
+          onPress={() => onOpenPhoto(1)}
+        />
+        <MemoryPhoto
+          media={media[2]}
+          aspectRatio={4 / 3}
+          onPress={() => onOpenPhoto(2)}
+        />
       </View>
     </View>
   );
@@ -95,8 +139,15 @@ export function ThreePhotoLayout({ media }: ThreePhotoLayoutProps) {
 // ===============================
 
 const styles = StyleSheet.create({
+  photoButton: {
+    width: "100%",
+    overflow: "hidden",
+  },
   photo: {
     width: "100%",
+  },
+  pressedPhoto: {
+    opacity: 0.78,
   },
   twoPhotoGrid: {
     width: "100%",
