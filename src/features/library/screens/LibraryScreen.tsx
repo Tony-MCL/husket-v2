@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
   frameObject: {
     position: "absolute",
     left: "48.05%",
-    top: "9.3%",
+    top: "9.1%",
     width: "18.4%",
     height: "12.5%",
     zIndex: 18,
