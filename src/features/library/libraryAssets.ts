@@ -4,14 +4,6 @@
 
 import type { ImageSourcePropType } from "react-native";
 
-export const bookshelfAssets = {
-  oak: require("../../../assets/bookshelf-oak.png"),
-  birch: require("../../../assets/bookshelf-birch.png"),
-  white: require("../../../assets/bookshelf-white.png"),
-  black: require("../../../assets/bookshelf-black.png"),
-  walnut: require("../../../assets/bookshelf-walnut.png"),
-} satisfies Record<string, ImageSourcePropType>;
-
 export const libraryWallAsset = require("../../../assets/wall1.png") as ImageSourcePropType;
 
 export const libraryShelfAssets = {
@@ -37,5 +29,4 @@ export const albumSpineAssets: ImageSourcePropType[] = [
   require("../../../assets/new_album.png"),
 ];
 
-export type BookshelfThemeId = keyof typeof bookshelfAssets;
 export type LibraryShelfThemeId = keyof typeof libraryShelfAssets;
