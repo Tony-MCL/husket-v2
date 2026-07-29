@@ -4,7 +4,11 @@
 
 import * as ImagePicker from "expo-image-picker";
 
-import type { ImportedMemory, MemorySource } from "../../../models";
+import {
+  MAX_MEMORY_MEDIA_ITEMS,
+  type ImportedMemory,
+  type MemorySource,
+} from "../../../models";
 
 function normalizeAsset(
   asset: ImagePicker.ImagePickerAsset,
@@ -25,18 +29,31 @@ function normalizeAsset(
   };
 }
 
-export async function importFromPhotoLibrary(): Promise<ImportedMemory | null> {
+/** Velger mellom ett og tre bilder fra kamerarullen. */
+export async function importFromPhotoLibrary(
+  selectionLimit = MAX_MEMORY_MEDIA_ITEMS,
+): Promise<ImportedMemory[] | null> {
+  const safeSelectionLimit = Math.max(
+    1,
+    Math.min(selectionLimit, MAX_MEMORY_MEDIA_ITEMS),
+  );
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ["images"],
     allowsEditing: false,
+    allowsMultipleSelection: safeSelectionLimit > 1,
+    selectionLimit: safeSelectionLimit,
     quality: 1,
     exif: true,
   });
 
-  if (result.canceled || !result.assets[0]) return null;
-  return normalizeAsset(result.assets[0], "photo-library");
+  if (result.canceled || result.assets.length === 0) return null;
+
+  return result.assets
+    .slice(0, safeSelectionLimit)
+    .map((asset) => normalizeAsset(asset, "photo-library"));
 }
 
+/** Tar ett nytt bilde. Flere bilder tas ved å åpne kameraet flere ganger. */
 export async function importFromCamera(): Promise<ImportedMemory | null> {
   const permission = await ImagePicker.requestCameraPermissionsAsync();
   if (!permission.granted) {
