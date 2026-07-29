@@ -44,7 +44,8 @@ const ALBUM_HEIGHT_RATIO = 0.132;
 const SPINE_LABEL_WIDTH_RATIO = 0.5;
 const SPINE_LABEL_HEIGHT_RATIO = 0.58;
 const SPINE_LABEL_TOP_RATIO = 0.21;
-const SHELF_TOPS = [28.6, 45, 61.4, 77.8];
+const OBJECT_SHELF_TOP = 20;
+const ALBUM_SHELF_TOPS = [36.4, 52.8, 69.2, 85.6];
 const SHELF_LEFT = 7.5;
 const SHELF_WIDTH = 85;
 const SHELF_HEIGHT = 7.2;
@@ -204,7 +205,7 @@ export function LibraryScreen() {
   function getBookPosition(index: number) {
     const shelfIndex = Math.floor(index / BOOKS_PER_SHELF);
     const slotIndex = index % BOOKS_PER_SHELF;
-    const shelfTop = SHELF_TOPS[shelfIndex];
+    const shelfTop = ALBUM_SHELF_TOPS[shelfIndex];
     const albumTop = shelfTop - ALBUM_HEIGHT_RATIO * 100 + ALBUM_BOTTOM_OFFSET;
 
     return {
@@ -324,6 +325,21 @@ export function LibraryScreen() {
           <Text style={styles.title}>{t("library.title")}</Text>
         </View>
 
+        <Image
+          pointerEvents="none"
+          source={libraryShelfAssets[ACTIVE_SHELF_THEME]}
+          resizeMode="contain"
+          style={[
+            styles.shelf,
+            {
+              left: `${SHELF_LEFT}%`,
+              top: `${OBJECT_SHELF_TOP}%`,
+              width: `${SHELF_WIDTH}%`,
+              height: `${SHELF_HEIGHT}%`,
+            },
+          ]}
+        />
+
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("library.camera")}
@@ -368,7 +384,7 @@ export function LibraryScreen() {
           </View>
         </Pressable>
 
-        {SHELF_TOPS.map((shelfTop, shelfIndex) => (
+        {ALBUM_SHELF_TOPS.map((shelfTop, shelfIndex) => (
           <Image
             key={`shelf-${shelfIndex}`}
             pointerEvents="none"
@@ -630,16 +646,16 @@ const styles = StyleSheet.create({
   },
   cameraObject: {
     position: "absolute",
-    left: "34%",
-    top: "6.1%",
+    left: "31%",
+    top: "14.2%",
     width: "10.5%",
     height: "6.4%",
     zIndex: 18,
   },
   frameObject: {
     position: "absolute",
-    left: "51%",
-    top: "3.9%",
+    left: "50.5%",
+    top: "11.8%",
     width: "13.5%",
     height: "9.2%",
     zIndex: 18,
@@ -714,7 +730,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: "12%",
     right: "12%",
-    top: "25%",
+    top: "31%",
     minHeight: 60,
     alignItems: "center",
     justifyContent: "center",
@@ -733,7 +749,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: "14%",
     right: "14%",
-    top: "80%",
+    top: "91%",
     color: LIGHT_WALL_MUTED_TEXT,
     fontSize: 12,
     lineHeight: 17,
