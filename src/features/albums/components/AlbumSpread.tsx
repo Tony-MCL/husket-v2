@@ -13,6 +13,7 @@ type AlbumSpreadProps = {
   rightMemory?: Memory;
   isCompact: boolean;
   onOpenMemory: (memoryId: string) => void;
+  onOpenPhoto: (memory: Memory, photoIndex: number) => void;
 };
 
 // ===============================
@@ -27,6 +28,7 @@ export function AlbumSpread({
   rightMemory,
   isCompact,
   onOpenMemory,
+  onOpenPhoto,
 }: AlbumSpreadProps) {
   const theme = useAppTheme();
 
@@ -36,6 +38,7 @@ export function AlbumSpread({
         <AlbumPage
           memory={leftMemory}
           onPress={() => onOpenMemory(leftMemory.id)}
+          onOpenPhoto={(photoIndex) => onOpenPhoto(leftMemory, photoIndex)}
         />
       </View>
     );
@@ -57,6 +60,7 @@ export function AlbumSpread({
         <AlbumPage
           memory={leftMemory}
           onPress={() => onOpenMemory(leftMemory.id)}
+          onOpenPhoto={(photoIndex) => onOpenPhoto(leftMemory, photoIndex)}
         />
       </View>
 
@@ -76,6 +80,7 @@ export function AlbumSpread({
           <AlbumPage
             memory={rightMemory}
             onPress={() => onOpenMemory(rightMemory.id)}
+            onOpenPhoto={(photoIndex) => onOpenPhoto(rightMemory, photoIndex)}
           />
         ) : (
           <View
