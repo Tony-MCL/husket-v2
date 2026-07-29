@@ -113,7 +113,11 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
         mood,
       });
 
-      router.replace(`/albums/${updatedMemory.albumId}`);
+      if (updatedMemory.albumId === memory.albumId) {
+        router.back();
+      } else {
+        router.replace(`/albums/${updatedMemory.albumId}`);
+      }
     } catch {
       setError(t("memoryDetail.saveError"));
     } finally {
