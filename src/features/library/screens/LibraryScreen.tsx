@@ -49,8 +49,8 @@ const SHELF_LEFT = 7.5;
 const SHELF_WIDTH = 85;
 const SHELF_HEIGHT = 7.2;
 const ALBUM_BOTTOM_OFFSET = 1.7;
-const ALBUM_ROW_LEFT = 9;
-const ALBUM_ROW_RIGHT = 9;
+const ALBUM_ROW_LEFT = 12;
+const ALBUM_ROW_RIGHT = 12;
 const ACTIVE_SHELF_THEME = "oak" as const;
 
 // ===============================
