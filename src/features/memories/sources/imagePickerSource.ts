@@ -3,6 +3,7 @@
 // ===============================
 
 import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 
 import {
   MAX_MEMORY_MEDIA_ITEMS,
@@ -10,9 +11,44 @@ import {
   type MemorySource,
 } from "../../../models";
 
+// ===============================
+// GPS helpers
+// ===============================
+
+type CapturedCoordinates = {
+  latitude: number;
+  longitude: number;
+};
+
+async function getCurrentCoordinates(): Promise<CapturedCoordinates | undefined> {
+  const permission = await Location.requestForegroundPermissionsAsync();
+
+  if (!permission.granted) {
+    return undefined;
+  }
+
+  try {
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+
+    return {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+// ===============================
+// Asset normalization
+// ===============================
+
 function normalizeAsset(
   asset: ImagePicker.ImagePickerAsset,
   source: MemorySource,
+  capturedCoordinates?: CapturedCoordinates,
 ): ImportedMemory {
   return {
     source,
@@ -25,9 +61,15 @@ function normalizeAsset(
       assetId: asset.assetId ?? undefined,
       fileSize: asset.fileSize ?? undefined,
       mediaType: asset.type ?? "image",
+      exif: asset.exif ?? undefined,
+      capturedCoordinates,
     },
   };
 }
+
+// ===============================
+// Photo library import
+// ===============================
 
 /** Velger mellom ett og tre bilder fra kamerarullen. */
 export async function importFromPhotoLibrary(
@@ -53,10 +95,14 @@ export async function importFromPhotoLibrary(
     .map((asset) => normalizeAsset(asset, "photo-library"));
 }
 
-/** Tar ett nytt bilde. Flere bilder tas ved å åpne kameraet flere ganger. */
+// ===============================
+// Camera import
+// ===============================
+
+/** Tar ett nytt bilde og forsøker å lagre telefonens GPS-posisjon. */
 export async function importFromCamera(): Promise<ImportedMemory | null> {
-  const permission = await ImagePicker.requestCameraPermissionsAsync();
-  if (!permission.granted) {
+  const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+  if (!cameraPermission.granted) {
     throw new Error("CAMERA_PERMISSION_DENIED");
   }
 
@@ -68,5 +114,8 @@ export async function importFromCamera(): Promise<ImportedMemory | null> {
   });
 
   if (result.canceled || !result.assets[0]) return null;
-  return normalizeAsset(result.assets[0], "camera");
+
+  const capturedCoordinates = await getCurrentCoordinates();
+
+  return normalizeAsset(result.assets[0], "camera", capturedCoordinates);
 }
