@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   cameraObject: {
     position: "absolute",
     left: "28.25%",
-    top: "15.3%",
+    top: "16.3%",
     width: "16%",
     height: "9.6%",
     zIndex: 18,
