@@ -70,6 +70,13 @@ export type TranslationDictionary = {
     commentPlaceholder: string;
     moodTitle: string;
     albumTitle: string;
+    chooseAlbum: string;
+    createAlbum: string;
+    createAlbumTitle: string;
+    albumNamePlaceholder: string;
+    cancel: string;
+    creatingAlbum: string;
+    albumCreateError: string;
     noAlbums: string;
     saveButton: string;
     saving: string;
