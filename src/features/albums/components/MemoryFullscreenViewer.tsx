@@ -3,7 +3,15 @@
 // ===============================
 
 import { useEffect, useState } from "react";
-import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Modal,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Memory } from "../../../models";
@@ -22,7 +30,7 @@ type MemoryFullscreenViewerProps = {
 // Fullscreen viewer
 // ===============================
 
-/** Viser bildene i ett minne i fullskjerm uten å forlate albumoppslaget. */
+/** Viser bildene i ett minne i ekte fullskjerm uten albumgrensesnitt rundt. */
 export function MemoryFullscreenViewer({
   memory,
   initialPhotoIndex,
@@ -54,21 +62,37 @@ export function MemoryFullscreenViewer({
       visible={memory !== null}
       transparent={false}
       animationType="fade"
+      presentationStyle="fullScreen"
       onRequestClose={onClose}
       statusBarTranslucent
+      navigationBarTranslucent
     >
-      <View
-        style={[
-          styles.screen,
-          {
-            paddingTop: insets.top + 12,
-            paddingBottom: insets.bottom + 16,
-          },
-        ]}
-      >
-        <View style={styles.topBar}>
+      <StatusBar hidden />
+
+      <View style={styles.screen}>
+        <View style={styles.imageArea}>
+          {activeMedia ? (
+            <Image
+              source={{ uri: activeMedia.localUri }}
+              resizeMode="contain"
+              style={styles.image}
+            />
+          ) : null}
+        </View>
+
+        <View
+          pointerEvents="box-none"
+          style={[
+            styles.topOverlay,
+            {
+              paddingTop: insets.top + 10,
+              paddingLeft: insets.left + 16,
+              paddingRight: insets.right + 16,
+            },
+          ]}
+        >
           <Text style={styles.counter}>
-            {media.length > 0 ? `${safeActiveIndex + 1} / ${media.length}` : ""}
+            {media.length > 1 ? `${safeActiveIndex + 1} / ${media.length}` : ""}
           </Text>
 
           <Pressable
@@ -84,60 +108,62 @@ export function MemoryFullscreenViewer({
           </Pressable>
         </View>
 
-        <View style={styles.imageArea}>
-          {activeMedia ? (
-            <Image
-              source={{ uri: activeMedia.localUri }}
-              resizeMode="contain"
-              style={styles.image}
-            />
-          ) : null}
-        </View>
-
-        <View style={styles.navigationRow}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Previous photo"
-            disabled={!hasPrevious}
-            onPress={() => openPhoto(safeActiveIndex - 1)}
-            style={({ pressed }) => [
-              styles.navigationButton,
-              !hasPrevious ? styles.disabled : null,
-              pressed && hasPrevious ? styles.pressed : null,
+        {media.length > 1 ? (
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.bottomOverlay,
+              {
+                paddingBottom: insets.bottom + 14,
+                paddingLeft: insets.left + 16,
+                paddingRight: insets.right + 16,
+              },
             ]}
           >
-            <Text style={styles.navigationButtonText}>‹</Text>
-          </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Previous photo"
+              disabled={!hasPrevious}
+              onPress={() => openPhoto(safeActiveIndex - 1)}
+              style={({ pressed }) => [
+                styles.navigationButton,
+                !hasPrevious ? styles.disabled : null,
+                pressed && hasPrevious ? styles.pressed : null,
+              ]}
+            >
+              <Text style={styles.navigationButtonText}>‹</Text>
+            </Pressable>
 
-          <View style={styles.dotRow}>
-            {media.map((item, index) => (
-              <Pressable
-                key={item.id}
-                accessibilityRole="button"
-                accessibilityLabel={`Open photo ${index + 1}`}
-                onPress={() => openPhoto(index)}
-                style={[
-                  styles.dot,
-                  index === safeActiveIndex ? styles.activeDot : null,
-                ]}
-              />
-            ))}
+            <View style={styles.dotRow}>
+              {media.map((item, index) => (
+                <Pressable
+                  key={item.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Open photo ${index + 1}`}
+                  onPress={() => openPhoto(index)}
+                  style={[
+                    styles.dot,
+                    index === safeActiveIndex ? styles.activeDot : null,
+                  ]}
+                />
+              ))}
+            </View>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Next photo"
+              disabled={!hasNext}
+              onPress={() => openPhoto(safeActiveIndex + 1)}
+              style={({ pressed }) => [
+                styles.navigationButton,
+                !hasNext ? styles.disabled : null,
+                pressed && hasNext ? styles.pressed : null,
+              ]}
+            >
+              <Text style={styles.navigationButtonText}>›</Text>
+            </Pressable>
           </View>
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Next photo"
-            disabled={!hasNext}
-            onPress={() => openPhoto(safeActiveIndex + 1)}
-            style={({ pressed }) => [
-              styles.navigationButton,
-              !hasNext ? styles.disabled : null,
-              pressed && hasNext ? styles.pressed : null,
-            ]}
-          >
-            <Text style={styles.navigationButtonText}>›</Text>
-          </Pressable>
-        </View>
+        ) : null}
       </View>
     </Modal>
   );
@@ -150,17 +176,30 @@ export function MemoryFullscreenViewer({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#111111",
-    paddingHorizontal: 16,
+    backgroundColor: "#000000",
   },
-  topBar: {
-    minHeight: 48,
+  imageArea: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  topOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    minHeight: 76,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    backgroundColor: "#00000055",
   },
   counter: {
-    color: "#FFFFFFCC",
+    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "700",
   },
@@ -170,7 +209,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 22,
-    backgroundColor: "#FFFFFF18",
+    backgroundColor: "#00000099",
   },
   closeButtonText: {
     color: "#FFFFFF",
@@ -178,21 +217,17 @@ const styles = StyleSheet.create({
     lineHeight: 36,
     fontWeight: "300",
   },
-  imageArea: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  navigationRow: {
-    minHeight: 64,
+  bottomOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    minHeight: 78,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 16,
+    backgroundColor: "#00000055",
   },
   navigationButton: {
     width: 48,
@@ -200,7 +235,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,
-    backgroundColor: "#FFFFFF18",
+    backgroundColor: "#00000099",
   },
   navigationButtonText: {
     color: "#FFFFFF",
