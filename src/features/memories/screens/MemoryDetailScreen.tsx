@@ -3,10 +3,11 @@
 // ===============================
 
 import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -24,7 +25,10 @@ import type {
   MemoryMood,
 } from "../../../models";
 import { useAppTheme } from "../../../theme/useAppTheme";
-import { getAlbums } from "../../albums/services/albumService";
+import {
+  createAlbum,
+  getAlbums,
+} from "../../albums/services/albumService";
 import { getMemoryById, updateMemory } from "../services/memoryService";
 
 const moods: Array<{ value: MemoryMood; emoji: string }> = [
@@ -41,6 +45,10 @@ type MemoryDetailScreenProps = {
   memoryId: string;
 };
 
+// ===============================
+// Memory editor
+// ===============================
+
 export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
   const { t } = useLanguage();
   const theme = useAppTheme();
@@ -52,6 +60,11 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
   const [albumId, setAlbumId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAlbumPickerVisible, setIsAlbumPickerVisible] = useState(false);
+  const [isCreateAlbumVisible, setIsCreateAlbumVisible] = useState(false);
+  const [newAlbumTitle, setNewAlbumTitle] = useState("");
+  const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
+  const [albumModalError, setAlbumModalError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
@@ -82,6 +95,11 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
     void loadData();
   }, [loadData]);
 
+  const selectedAlbum = useMemo(
+    () => albums.find((album) => album.id === albumId) ?? null,
+    [albumId, albums],
+  );
+
   function moveMedia(fromIndex: number, toIndex: number) {
     if (toIndex < 0 || toIndex >= media.length) return;
 
@@ -99,6 +117,61 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
       current.filter((_, index) => index !== indexToRemove),
     );
   }
+
+  // ===============================
+  // Album picker
+  // ===============================
+
+  function openAlbumPicker() {
+    setAlbumModalError(null);
+    setIsAlbumPickerVisible(true);
+  }
+
+  function closeAlbumPicker() {
+    setIsAlbumPickerVisible(false);
+  }
+
+  function selectAlbum(selectedAlbumId: string) {
+    setAlbumId(selectedAlbumId);
+    setIsAlbumPickerVisible(false);
+  }
+
+  function openCreateAlbumModal() {
+    setIsAlbumPickerVisible(false);
+    setAlbumModalError(null);
+    setNewAlbumTitle("");
+    setIsCreateAlbumVisible(true);
+  }
+
+  function closeCreateAlbumModal() {
+    if (isCreatingAlbum) return;
+    setIsCreateAlbumVisible(false);
+    setNewAlbumTitle("");
+    setAlbumModalError(null);
+  }
+
+  async function handleCreateAlbum() {
+    const title = newAlbumTitle.trim();
+    if (!title || isCreatingAlbum) return;
+
+    try {
+      setIsCreatingAlbum(true);
+      setAlbumModalError(null);
+      const album = await createAlbum({ title });
+      setAlbums((current) => [...current, album]);
+      setAlbumId(album.id);
+      setNewAlbumTitle("");
+      setIsCreateAlbumVisible(false);
+    } catch {
+      setAlbumModalError(t("memories.albumCreateError"));
+    } finally {
+      setIsCreatingAlbum(false);
+    }
+  }
+
+  // ===============================
+  // Save changes
+  // ===============================
 
   async function handleSave() {
     if (!memory || !albumId || media.length === 0 || isSaving) return;
@@ -126,7 +199,9 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}> 
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
+    >
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[
@@ -205,7 +280,9 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
                       onPress={() => moveMedia(index, index + 1)}
                       style={[
                         styles.mediaControlButton,
-                        index === media.length - 1 ? styles.disabledControl : null,
+                        index === media.length - 1
+                          ? styles.disabledControl
+                          : null,
                       ]}
                     >
                       <Text style={styles.mediaControlText}>→</Text>
@@ -269,33 +346,34 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}> 
                 {t("memoryDetail.albumTitle")}
               </Text>
-              <View style={{ gap: theme.spacing.sm }}>
-                {albums.map((album) => {
-                  const selected = album.id === albumId;
-
-                  return (
-                    <Pressable
-                      key={album.id}
-                      onPress={() => setAlbumId(album.id)}
-                      style={[
-                        styles.albumOption,
-                        {
-                          borderColor: selected
-                            ? theme.colors.accent
-                            : theme.colors.border,
-                          backgroundColor: theme.colors.surface,
-                          borderRadius: theme.radii.md,
-                          padding: theme.spacing.md,
-                        },
-                      ]}
-                    >
-                      <Text style={{ color: theme.colors.text, fontWeight: "700" }}>
-                        {album.title}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
+              <Pressable
+                onPress={openAlbumPicker}
+                style={({ pressed }) => [
+                  styles.albumPickerButton,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                    borderRadius: theme.radii.md,
+                    padding: theme.spacing.md,
+                    opacity: pressed ? 0.8 : 1,
+                  },
+                ]}
+              >
+                <Text
+                  numberOfLines={1}
+                  style={[styles.albumName, { color: theme.colors.text }]}
+                >
+                  {selectedAlbum?.title ?? t("memories.chooseAlbum")}
+                </Text>
+                <Text
+                  style={[
+                    styles.albumPickerChevron,
+                    { color: theme.colors.textMuted },
+                  ]}
+                >
+                  ⌄
+                </Text>
+              </Pressable>
             </View>
 
             <Pressable
@@ -325,9 +403,201 @@ export function MemoryDetailScreen({ memoryId }: MemoryDetailScreenProps) {
           </>
         ) : null}
       </ScrollView>
+
+      <Modal
+        animationType="fade"
+        transparent
+        visible={isAlbumPickerVisible}
+        onRequestClose={closeAlbumPicker}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={closeAlbumPicker}>
+          <Pressable
+            onPress={(event) => event.stopPropagation()}
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+                borderRadius: theme.radii.lg,
+                padding: theme.spacing.md,
+                gap: theme.spacing.sm,
+              },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}> 
+              {t("memoryDetail.albumTitle")}
+            </Text>
+
+            <Pressable
+              onPress={openCreateAlbumModal}
+              style={({ pressed }) => [
+                styles.albumModalOption,
+                {
+                  borderColor: theme.colors.accent,
+                  borderRadius: theme.radii.md,
+                  padding: theme.spacing.md,
+                  opacity: pressed ? 0.75 : 1,
+                },
+              ]}
+            >
+              <Text
+                style={[styles.createAlbumText, { color: theme.colors.accent }]}
+              >
+                ＋ {t("memories.createAlbum")}
+              </Text>
+            </Pressable>
+
+            <ScrollView
+              style={styles.albumList}
+              contentContainerStyle={{ gap: theme.spacing.sm }}
+              keyboardShouldPersistTaps="handled"
+            >
+              {albums.length === 0 ? (
+                <Text style={[styles.body, { color: theme.colors.textMuted }]}> 
+                  {t("memories.noAlbums")}
+                </Text>
+              ) : (
+                albums.map((album) => {
+                  const isSelected = album.id === albumId;
+
+                  return (
+                    <Pressable
+                      key={album.id}
+                      onPress={() => selectAlbum(album.id)}
+                      style={({ pressed }) => [
+                        styles.albumModalOption,
+                        {
+                          backgroundColor: isSelected
+                            ? `${theme.colors.accent}18`
+                            : theme.colors.background,
+                          borderColor: isSelected
+                            ? theme.colors.accent
+                            : theme.colors.border,
+                          borderRadius: theme.radii.md,
+                          padding: theme.spacing.md,
+                          opacity: pressed ? 0.8 : 1,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.albumName, { color: theme.colors.text }]}
+                      >
+                        {album.title}
+                      </Text>
+                    </Pressable>
+                  );
+                })
+              )}
+            </ScrollView>
+
+            <Pressable onPress={closeAlbumPicker} style={styles.cancelButton}>
+              <Text style={{ color: theme.colors.textMuted, fontWeight: "700" }}>
+                {t("memories.cancel")}
+              </Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent
+        visible={isCreateAlbumVisible}
+        onRequestClose={closeCreateAlbumModal}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={closeCreateAlbumModal}>
+          <Pressable
+            onPress={(event) => event.stopPropagation()}
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+                borderRadius: theme.radii.lg,
+                padding: theme.spacing.lg,
+                gap: theme.spacing.md,
+              },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}> 
+              {t("memories.createAlbumTitle")}
+            </Text>
+
+            <TextInput
+              autoFocus
+              value={newAlbumTitle}
+              onChangeText={setNewAlbumTitle}
+              placeholder={t("memories.albumNamePlaceholder")}
+              placeholderTextColor={theme.colors.textMuted}
+              returnKeyType="done"
+              onSubmitEditing={() => void handleCreateAlbum()}
+              style={[
+                styles.input,
+                {
+                  color: theme.colors.text,
+                  borderColor: theme.colors.border,
+                  borderRadius: theme.radii.md,
+                  padding: theme.spacing.md,
+                },
+              ]}
+            />
+
+            {albumModalError ? (
+              <Text style={styles.error}>{albumModalError}</Text>
+            ) : null}
+
+            <View style={styles.modalActionRow}>
+              <Pressable
+                disabled={isCreatingAlbum}
+                onPress={closeCreateAlbumModal}
+                style={({ pressed }) => [
+                  styles.modalSecondaryButton,
+                  {
+                    borderColor: theme.colors.border,
+                    borderRadius: theme.radii.md,
+                    opacity: isCreatingAlbum ? 0.45 : pressed ? 0.75 : 1,
+                  },
+                ]}
+              >
+                <Text style={{ color: theme.colors.text, fontWeight: "700" }}>
+                  {t("memories.cancel")}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                disabled={!newAlbumTitle.trim() || isCreatingAlbum}
+                onPress={() => void handleCreateAlbum()}
+                style={({ pressed }) => [
+                  styles.modalPrimaryButton,
+                  {
+                    backgroundColor: theme.colors.accent,
+                    borderRadius: theme.radii.md,
+                    opacity:
+                      !newAlbumTitle.trim() || isCreatingAlbum
+                        ? 0.45
+                        : pressed
+                          ? 0.8
+                          : 1,
+                  },
+                ]}
+              >
+                <Text style={styles.saveButtonText}>
+                  {isCreatingAlbum
+                    ? t("memories.creatingAlbum")
+                    : t("memories.createAlbum")}
+                </Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
+
+// ===============================
+// Styles
+// ===============================
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
@@ -339,6 +609,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   title: { fontWeight: "800" },
+  body: { lineHeight: 24 },
   mediaGrid: {
     flexDirection: "row",
     gap: 10,
@@ -385,8 +656,71 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   moodEmoji: { fontSize: 24 },
-  albumOption: { borderWidth: 2 },
+  albumPickerButton: {
+    minHeight: 52,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  albumPickerChevron: {
+    fontSize: 22,
+    lineHeight: 24,
+  },
+  albumName: { flexShrink: 1, fontSize: 16, fontWeight: "700" },
   saveButton: { alignItems: "center" },
   saveButtonText: { color: "#ffffff", fontSize: 16, fontWeight: "700" },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "#00000080",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 520,
+    maxHeight: "80%",
+    borderWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+  },
+  albumList: {
+    maxHeight: 360,
+  },
+  albumModalOption: {
+    minHeight: 50,
+    borderWidth: 1,
+    justifyContent: "center",
+  },
+  createAlbumText: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  cancelButton: {
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalActionRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  modalSecondaryButton: {
+    flex: 1,
+    minHeight: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+  },
+  modalPrimaryButton: {
+    flex: 1,
+    minHeight: 48,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   error: { color: "#b42318", fontWeight: "600" },
 });
