@@ -2,7 +2,7 @@
 // src/features/albums/components/MemoryFullscreenViewer.tsx
 // ===============================
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Image,
   Modal,
@@ -10,11 +10,33 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Memory } from "../../../models";
+
+// ===============================
+// Constants
+// ===============================
+
+const MIN_SCALE = 1;
+const MAX_SCALE = 4;
+const DOUBLE_TAP_SCALE = 2.5;
+const SWIPE_THRESHOLD = 70;
+const SWIPE_VELOCITY_THRESHOLD = 700;
 
 // ===============================
 // Types
@@ -26,17 +48,186 @@ type MemoryFullscreenViewerProps = {
   onClose: () => void;
 };
 
+type ZoomablePhotoProps = {
+  imageUri: string;
+  width: number;
+  height: number;
+  canShowPrevious: boolean;
+  canShowNext: boolean;
+  onShowPrevious: () => void;
+  onShowNext: () => void;
+};
+
+// ===============================
+// Helpers
+// ===============================
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  "worklet";
+  return Math.min(Math.max(value, minimum), maximum);
+}
+
+// ===============================
+// Zoomable photo
+// ===============================
+
+function ZoomablePhoto({
+  imageUri,
+  width,
+  height,
+  canShowPrevious,
+  canShowNext,
+  onShowPrevious,
+  onShowNext,
+}: ZoomablePhotoProps) {
+  const scale = useSharedValue(MIN_SCALE);
+  const savedScale = useSharedValue(MIN_SCALE);
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const savedTranslateX = useSharedValue(0);
+  const savedTranslateY = useSharedValue(0);
+
+  useEffect(() => {
+    scale.value = MIN_SCALE;
+    savedScale.value = MIN_SCALE;
+    translateX.value = 0;
+    translateY.value = 0;
+    savedTranslateX.value = 0;
+    savedTranslateY.value = 0;
+  }, [
+    imageUri,
+    savedScale,
+    savedTranslateX,
+    savedTranslateY,
+    scale,
+    translateX,
+    translateY,
+  ]);
+
+  const resetTransform = () => {
+    "worklet";
+    scale.value = withTiming(MIN_SCALE);
+    savedScale.value = MIN_SCALE;
+    translateX.value = withTiming(0);
+    translateY.value = withTiming(0);
+    savedTranslateX.value = 0;
+    savedTranslateY.value = 0;
+  };
+
+  const pinchGesture = Gesture.Pinch()
+    .onUpdate((event) => {
+      const nextScale = clamp(savedScale.value * event.scale, MIN_SCALE, MAX_SCALE);
+      scale.value = nextScale;
+    })
+    .onEnd(() => {
+      savedScale.value = scale.value;
+
+      if (scale.value <= MIN_SCALE + 0.01) {
+        resetTransform();
+      }
+    });
+
+  const panGesture = Gesture.Pan()
+    .minDistance(4)
+    .onUpdate((event) => {
+      if (scale.value > MIN_SCALE + 0.01) {
+        const maxTranslateX = ((scale.value - 1) * width) / 2;
+        const maxTranslateY = ((scale.value - 1) * height) / 2;
+
+        translateX.value = clamp(
+          savedTranslateX.value + event.translationX,
+          -maxTranslateX,
+          maxTranslateX,
+        );
+        translateY.value = clamp(
+          savedTranslateY.value + event.translationY,
+          -maxTranslateY,
+          maxTranslateY,
+        );
+        return;
+      }
+
+      translateX.value = event.translationX;
+    })
+    .onEnd((event) => {
+      if (scale.value > MIN_SCALE + 0.01) {
+        savedTranslateX.value = translateX.value;
+        savedTranslateY.value = translateY.value;
+        return;
+      }
+
+      const swipedLeft =
+        event.translationX <= -SWIPE_THRESHOLD ||
+        event.velocityX <= -SWIPE_VELOCITY_THRESHOLD;
+      const swipedRight =
+        event.translationX >= SWIPE_THRESHOLD ||
+        event.velocityX >= SWIPE_VELOCITY_THRESHOLD;
+
+      if (swipedLeft && canShowNext) {
+        runOnJS(onShowNext)();
+      } else if (swipedRight && canShowPrevious) {
+        runOnJS(onShowPrevious)();
+      }
+
+      translateX.value = withTiming(0);
+      savedTranslateX.value = 0;
+    });
+
+  const doubleTapGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .maxDuration(250)
+    .onEnd(() => {
+      if (scale.value > MIN_SCALE + 0.01) {
+        resetTransform();
+        return;
+      }
+
+      scale.value = withTiming(DOUBLE_TAP_SCALE);
+      savedScale.value = DOUBLE_TAP_SCALE;
+      translateX.value = 0;
+      translateY.value = 0;
+      savedTranslateX.value = 0;
+      savedTranslateY.value = 0;
+    });
+
+  const composedGesture = Gesture.Simultaneous(
+    pinchGesture,
+    Gesture.Race(doubleTapGesture, panGesture),
+  );
+
+  const animatedImageStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { scale: scale.value },
+    ],
+  }));
+
+  return (
+    <GestureDetector gesture={composedGesture}>
+      <Animated.View style={styles.zoomSurface}>
+        <Animated.Image
+          source={{ uri: imageUri }}
+          resizeMode="contain"
+          style={[styles.image, animatedImageStyle]}
+        />
+      </Animated.View>
+    </GestureDetector>
+  );
+}
+
 // ===============================
 // Fullscreen viewer
 // ===============================
 
-/** Viser bildene i ett minne i ekte fullskjerm uten albumgrensesnitt rundt. */
+/** Viser bildene i ett minne med zoom, panorering og sveiping. */
 export function MemoryFullscreenViewer({
   memory,
   initialPhotoIndex,
   onClose,
 }: MemoryFullscreenViewerProps) {
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const [activePhotoIndex, setActivePhotoIndex] = useState(initialPhotoIndex);
   const media = memory?.media ?? [];
 
@@ -51,6 +242,14 @@ export function MemoryFullscreenViewer({
   const activeMedia = media[safeActiveIndex];
   const hasPrevious = safeActiveIndex > 0;
   const hasNext = safeActiveIndex < media.length - 1;
+
+  const viewerSize = useMemo(
+    () => ({
+      width: Math.max(width, 1),
+      height: Math.max(height, 1),
+    }),
+    [height, width],
+  );
 
   function openPhoto(photoIndex: number) {
     if (photoIndex < 0 || photoIndex >= media.length) return;
@@ -69,13 +268,18 @@ export function MemoryFullscreenViewer({
     >
       <StatusBar hidden />
 
-      <View style={styles.screen}>
+      <GestureHandlerRootView style={styles.screen}>
         <View style={styles.imageArea}>
           {activeMedia ? (
-            <Image
-              source={{ uri: activeMedia.localUri }}
-              resizeMode="contain"
-              style={styles.image}
+            <ZoomablePhoto
+              key={activeMedia.id}
+              imageUri={activeMedia.localUri}
+              width={viewerSize.width}
+              height={viewerSize.height}
+              canShowPrevious={hasPrevious}
+              canShowNext={hasNext}
+              onShowPrevious={() => openPhoto(safeActiveIndex - 1)}
+              onShowNext={() => openPhoto(safeActiveIndex + 1)}
             />
           ) : null}
         </View>
@@ -164,7 +368,7 @@ export function MemoryFullscreenViewer({
             </Pressable>
           </View>
         ) : null}
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
@@ -180,6 +384,13 @@ const styles = StyleSheet.create({
   },
   imageArea: {
     ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  zoomSurface: {
+    width: "100%",
+    height: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
